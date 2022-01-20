@@ -1,0 +1,5 @@
+tensorflow
+deap
+scoop
+matplotlib
+numpy
