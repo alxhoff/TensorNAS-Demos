@@ -38,8 +38,11 @@ fi
 
 IFS= read -s -p "Password: " password; echo
 
-while IFS= read -r line; do
+#while IFS= read -r line; do
+while IFS="" read -r line || [ -n "$line" ]
+do
     ip=${line%% *}
+    echo "HOST: $ip"
     echo "sshpass -p ***** ssh-copy-id -i $pub_key $username@$ip"
     sshpass -p $password ssh-copy-id -f -i $pub_key -o StrictHostKeyChecking=no $username@$ip
 done < "hosts"

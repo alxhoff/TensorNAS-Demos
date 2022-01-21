@@ -20,17 +20,30 @@ else
   exit 1
 fi
 
-echo "Creating venv in '$directory'"
+if [[ -d "$directory" ]]; then
+  echo "Virtual environment directory '$directory' already exists"
+else
+  echo "Creating venv in '$directory'"
+  mkdir $directory
+  cd $directory
+  virtualenv -p $python .
+  cd ..
+fi
 
-mkdir $directory
-cd $directory
-virtualenv -p $python .
-cd ..
+echo "Sourcing venv"
 source $directory/bin/activate
-$python -m pip install --no-cache-dir --upgrade --force-reinstall -r ../$requirements
+$python -m pip install --upgrade -r $requirements
 
 echo "Cloning TensorNAS source"
 
 if [ -d "TensorNAS" ]; then
   echo "TensorNAS found, checking that it is recent"
   cd TensorNAS
+fi
+
+echo "Create symlinks for demos"
+
+ln -s ~/TensorNAS ~/TensorNAS-Demos/DEAP/Distributed/TensorNAS
+ln -s ~/TensorNAS ~/TensorNAS-Demos/DEAP/Standalone/TensorNAS
+ln -s ~/TensorNAS ~/TensorNAS-Demos/Standalone/TensorNAS
+
