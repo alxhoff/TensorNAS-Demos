@@ -9,11 +9,13 @@ do
     case "${flag}" in
         d) directory="${OPTARG}/$directory";;
         p) python=${OPTARG};;
-        r) requirements={$OPTARG};;
+        r) requirements=${OPTARG};;
     esac
 done
 
-if test -f "$requirements"; then
+echo "Requirements: $requirements"
+
+if [[ -f "$requirements" ]]; then
   echo "requirements.txt found"
 else
   echo "requirements.txt not found, please ensure file exists or give location using'-r'"
@@ -30,20 +32,23 @@ else
   cd ..
 fi
 
-echo "Sourcing venv"
-source $directory/bin/activate
+#echo "Sourcing venv"
+#source $directory/bin/activate
 $python -m pip install --upgrade -r $requirements
 
 echo "Cloning TensorNAS source"
 
-if [ -d "TensorNAS" ]; then
+if [ -d "TensorNAS-Project" ]; then
   echo "TensorNAS found, checking that it is recent"
-  cd TensorNAS
+  cd TensorNAS-Project
+  git submodule foreach git pull origin master
+else
+  git clone --recurse-submodules https://github.com/alxhoff/TensorNAS-Project.git
 fi
 
 echo "Create symlinks for demos"
 
-ln -s ~/TensorNAS ~/TensorNAS-Demos/DEAP/Distributed/TensorNAS
-ln -s ~/TensorNAS ~/TensorNAS-Demos/DEAP/Standalone/TensorNAS
-ln -s ~/TensorNAS ~/TensorNAS-Demos/Standalone/TensorNAS
+ln -s ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/TensorNAS-Demos/DEAP/Distributed/TensorNAS
+ln -s ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/TensorNAS-Demos/DEAP/Standalone/TensorNAS
+ln -s ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/TensorNAS-Demos/Standalone/TensorNAS
 
