@@ -1,5 +1,5 @@
 from __future__ import print_function
-from scoop import futures
+from scoop import futures, bootstrap
 
 def helloWorld(value):
     return "Hello World from Future #{0}".format(value)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 python=python3.8
-directory="env"
+directory="venv"
 host_file="hosts"
 requirements="requirements.txt"
 
@@ -25,11 +25,14 @@ done
 first_host=`head -n 1 hosts`
 scp ../$requirements $username@$first_host:~/
 scp ../CreateVEnv.sh $username@$first_host:~/
-ssh $username@$first_host "bash ~/CreateVEnv.sh -p $python -r ~/$requirements"
+ssh $username@$first_host "bash ~/CreateVEnv.sh -p $python -r ~/$requirements -d $directory"
 python_command='grep -q "$HOME/env/bin" $HOME/.bashrc || echo "PATH=$HOME/env/bin:$PATH" >> $HOME/.bashrc'
 ssh $username@$first_host $python_command
 python_path="\$HOME/$directory/lib/$python/site-packages/"
 python_path_command="grep -q \"$python_path\" \$HOME/.bashrc || echo \"PYTHONPATH=$python_path:\$PYTHONPATH\" >> \$HOME/.bashrc"
 ssh $username@$first_host $python_path_command
+activate_file="\$HOME/$directory/bin/activate"
+activate_command="grep -q \"source $activate_file\"  \$HOME/.bashrc || echo \"source $activate_file\" >> \$HOME/.bashrc"
+ssh $username@$first_host $activate_command
 
 pdsh -w ^hosts -l $username -R ssh "source ~/.bashrc"
