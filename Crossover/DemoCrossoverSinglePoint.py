@@ -1,4 +1,4 @@
-from TensorNAS.Demos.Datasets.MNIST import input_tensor_shape, mnist_class_count
+from Demos import input_tensor_shape, mnist_class_count
 from TensorNAS.Blocks.BlockArchitectures import MNISTBlockArchitecture
 from TensorNAS.Core.Crossover import _select_random_node, crossover_single_point
 

@@ -1,9 +1,7 @@
-TensorNAS_repo_dir =
-
 from TensorNAS.Blocks.BlockArchitectures.MNISTBlockArchitecture import (
     Block as ClassificationBlockArchitecture,
 )
-from TensorNAS.Demos.Datasets.MNIST import GetData
+from Demos.Datasets.MNIST import GetData
 
 import tensorflow as tf
 

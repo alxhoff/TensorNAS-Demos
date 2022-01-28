@@ -1,4 +1,4 @@
-from TensorNAS.Demos.Datasets.MNIST import GetData
+from Demos.Datasets.MNIST import GetData
 
 images_test, images_train, labels_test, labels_train, input_tensor_shape = GetData()
 

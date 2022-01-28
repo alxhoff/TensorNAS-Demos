@@ -1,4 +1,4 @@
-from TensorNAS.Demos.Datasets.Cifar10 import GetData
+from Demos.Datasets.Cifar10 import GetData
 
 images_test, images_train, labels_test, labels_train, input_tensor_shape = GetData()
 

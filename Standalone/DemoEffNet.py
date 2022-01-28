@@ -2,7 +2,7 @@ from TensorNAS.Blocks.BlockArchitectures.EffNetBlockArchitecture import (
     Block as EffNetBlockArchitecture,
 )
 
-from TensorNAS.Demos.Datasets.MNIST import GetData
+from Demos.Datasets.MNIST import GetData
 
 images_train, images_test, labels_train, labels_test, input_tensor_shape = GetData()
 class_count = 10

@@ -1,5 +1,11 @@
 tensorflow
+tensorflow_datasets
 deap
 scoop
 matplotlib
 numpy
+wget
+pydub
+scipy
+librosa
+pyyaml

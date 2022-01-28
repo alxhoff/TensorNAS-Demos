@@ -1,4 +1,4 @@
-from TensorNAS.Demos.Datasets.Cifar10 import GetData
+from Demos.Datasets.Cifar10 import GetData
 
 images_test, images_train, labels_test, labels_train, input_tensor_shape = GetData()
 
@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     args.config = "DemoImageClassificationEASimple"
 
-    from TensorNAS.Demos import (
+    from Demos import (
         load_globals_from_config,
         load_tensorflow_params_from_config,
         set_test_train_data,
@@ -35,7 +35,7 @@ if __name__ == "__main__":
         evaluate_individual,
         mutate_individual,
     )
-    from TensorNAS.Demos.DEAP import (
+    from Demos.DEAP import (
         load_genetic_params_from_config,
         run_deap_test,
         get_config,
@@ -59,7 +59,7 @@ if __name__ == "__main__":
         test_sample_size=get_global("test_sample_size"),
     )
 
-    from TensorNAS.Demos import gen_classification_ba
+    from Demos import gen_classification_ba
 
     pop, logbook, test = run_deap_test(
         generate_individual=gen_classification_ba,

@@ -1,29 +1,33 @@
-import argparse
-
-parser = argparse.ArgumentParser()
-
-parser.add_argument(
-    "--folder",
-    help="Absolute path to folder where interrupted test's output is stored",
-    default=None,
-)
-parser.add_argument(
-    "--gen", help="Generation from which the test should resume", type=int
-)
-
-parser.add_argument(
-    "--config",
-    help="Location of config file to be used, default is to use first found config file in current working directory, then parent directories",
-    type=str,
-    default=None,
-)
-
-args = parser.parse_args()
-
-args.config = "DemoAnomalyDetectionEASimple"
+from Demos.Datasets.ToyADMOS import GetData, GetTestData
+images_train, input_tensor_shape = GetData()
+test_data, test_labels = GetTestData()
 
 if __name__ == "__main__":
-    from TensorNAS.Demos import (
+    import argparse
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--folder",
+        help="Absolute path to folder where interrupted test's output is stored",
+        default=None,
+    )
+    parser.add_argument(
+        "--gen", help="Generation from which the test should resume", type=int
+    )
+
+    parser.add_argument(
+        "--config",
+        help="Location of config file to be used, default is to use first found config file in current working directory, then parent directories",
+        type=str,
+        default=None,
+    )
+
+    args = parser.parse_args()
+
+    args.config = "DemoAnomalyDetectionEASimple"
+
+    from Demos import (
         load_globals_from_config,
         load_tensorflow_params_from_config,
         set_test_train_data,
@@ -31,12 +35,11 @@ if __name__ == "__main__":
         evaluate_individual,
         mutate_individual,
     )
-    from TensorNAS.Demos.DEAP import (
+    from Demos.DEAP import (
         load_genetic_params_from_config,
         run_deap_test,
         get_config,
     )
-    from TensorNAS.Demos.Datasets.ToyADMOS import GetData, GetTestData
     from TensorNAS.Core.Crossover import crossover_individuals_sp
 
     config = get_config(args=args)
@@ -45,10 +48,7 @@ if __name__ == "__main__":
     load_genetic_params_from_config(config)
     load_tensorflow_params_from_config(config)
 
-    images_train, input_tensor_shape = GetData()
-    test_data, test_labels = GetTestData()
-
-    from TensorNAS.Demos import gen_auc_ba
+    from Demos import gen_auc_ba
 
     set_test_train_data(
         train_data=images_train,

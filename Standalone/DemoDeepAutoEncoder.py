@@ -1,7 +1,7 @@
 from TensorNAS.Blocks.BlockArchitectures.DeepAutoEncoderBlockArchitecture import (
     Block as DeepAutoEncoderBlockArchitecture,
 )
-from TensorNAS.Demos.Datasets.ToyADMOS import GetData, GetTestData
+from Demos.Datasets.ToyADMOS import GetData, GetTestData
 
 import tensorflow as tf
 
