@@ -16,7 +16,7 @@ def GetData():
     make_dataset_dirs(dataset_name)
 
     if not os.path.isfile(os.path.join(zip_dir, dataset_zip)):
-        print("Downloading Cifar10 dataset tar")
+        print("Downloading Cifar10 dataset tar into: {}".format(zip_dir))
         wget.download(dataset_url, out=zip_dir, bar=bar_progress)
     else:
         print("Cifar10 tar already exists, skipping download")
@@ -26,8 +26,9 @@ def GetData():
     if not len(os.listdir(output_dir)):
         import tarfile
 
-        print("Extracting Cifar10 tar")
-        tar = tarfile.open(zip_dir + "/{}".format(dataset_zip), "r:gz")
+        tar_filepath="{}/{}".format(zip_dir, dataset_zip)
+        print("Extracting Cifar10 tar to: {}".format(tar_filepath))
+        tar = tarfile.open(tar_filepath, "r:gz")
         tar.extractall(path=output_dir)
         tar.close()
 
@@ -36,6 +37,8 @@ def GetData():
         out_files = os.listdir(output_dir)
 
         sub_out_files = os.listdir(os.path.join(output_dir, out_files[0]))
+
+        print("Moving files {} into parent directory {}".format(sub_out_files, output_dir))
 
         for file in sub_out_files:
             shutil.move(os.path.join(output_dir, out_files[0], file), output_dir)

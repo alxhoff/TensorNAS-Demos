@@ -18,7 +18,8 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--config",
-        help="Location of config file to be used, default is to use first found config file in current working directory, then parent directories",
+        help="Location of config file to be used, default is to use first found config file in current working directory"
+             ", then parent directories",
         type=str,
         default=None,
     )

@@ -48,7 +48,12 @@ fi
 
 echo "Create symlinks for demos"
 
-ln -s ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS
-ln -s ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS
-ln -s ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/Standalone/TensorNAS
+echo "ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS"
+ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS
+
+echo "ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS"
+ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS
+
+echo "ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/Standalone/TensorNAS"
+ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/Standalone/TensorNAS
 
