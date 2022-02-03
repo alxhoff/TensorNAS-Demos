@@ -1,6 +1,6 @@
-from Demos.Datasets.MNIST import GetData
-
-images_test, images_train, labels_test, labels_train, input_tensor_shape = GetData()
+from Demos.Datasets.ToyADMOS import GetData, GetTestData
+images_train, input_tensor_shape = GetData()
+test_data, test_labels = GetTestData()
 
 if __name__ == "__main__":
     import argparse
@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    args.config = "DemoMNISTEASimple"
+    args.config = "DemoAnomalyDetectionEASimple"
 
     from Demos import (
         load_globals_from_config,
@@ -48,21 +48,19 @@ if __name__ == "__main__":
     load_genetic_params_from_config(config)
     load_tensorflow_params_from_config(config)
 
+    from Demos import gen_auc_ba
 
     set_test_train_data(
         train_data=images_train,
-        train_labels=labels_train,
-        test_data=images_test,
-        test_labels=labels_test,
+        test_data=test_data,
+        test_labels=test_labels,
         input_tensor_shape=input_tensor_shape,
         training_sample_size=get_global("training_sample_size"),
         test_sample_size=get_global("test_sample_size"),
     )
 
-    from Demos import gen_classification_ba
-
     pop, logbook, test = run_deap_test(
-        generate_individual=gen_classification_ba,
+        generate_individual=gen_auc_ba,
         evaluate_individual=evaluate_individual,
         crossover=crossover_individuals_sp,
         mutate=mutate_individual,
