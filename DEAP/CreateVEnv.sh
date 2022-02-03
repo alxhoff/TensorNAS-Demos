@@ -33,30 +33,33 @@ else
   cd ..
 fi
 
-echo "~/$directory/bin/$python -m pip install --upgrade -r $requirements"
-~/$directory/bin/$python -m pip install --upgrade -r $requirements
+echo "$directory/bin/$python -m pip install --upgrade -r $requirements"
+$directory/bin/$python -m pip install --upgrade -r $requirements
 
 echo "Cloning TensorNAS source"
 
-if [ -d "TensorNAS-Project" ]; then
+if [ -d "$directory/TensorNAS-Project" ]; then
   echo "TensorNAS found, checking that it is recent"
-  cd TensorNAS-Project
+  cd $directory/TensorNAS-Project
   git submodule foreach git pull origin master
 else
+  echo "TensorNAS not found, cloning"
+  cd $directory
   git clone --remote --recurse-submodules https://github.com/alxhoff/TensorNAS-Project.git
 fi
 
 echo "Create symlinks for demos"
+cd $directory
 
-echo "ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS"
-ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS
-ln -sf ~/TensorNAS-Project/Demos ~/TensorNAS-Project/Demos/DEAP/Distributed/Demos
+echo "ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS"
+ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS
+ln -sf $directory/TensorNAS-Project/Demos $directory/TensorNAS-Project/Demos/DEAP/Distributed/Demos
 
-echo "ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS"
-ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS
-ln -sf ~/TensorNAS-Project/Demos ~/TensorNAS-Project/Demos/DEAP/Standalone/Demos
+echo "ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS"
+ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS
+ln -sf $directory/TensorNAS-Project/Demos $directory/TensorNAS-Project/Demos/DEAP/Standalone/Demos
 
-echo "ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/Standalone/TensorNAS"
-ln -sf ~/TensorNAS-Project/TensorNAS ~/TensorNAS-Project/Demos/Standalone/TensorNAS
-ln -sf ~/TensorNAS-Project/Demos ~/TensorNAS-Project/Demos/Standalone/Demos
+echo "ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/Standalone/TensorNAS"
+ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/Standalone/TensorNAS
+ln -sf $directory/TensorNAS-Project/Demos $directory/TensorNAS-Project/Demos/Standalone/Demos
 
