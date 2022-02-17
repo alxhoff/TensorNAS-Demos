@@ -1,6 +1,5 @@
-from Demos.Datasets.Cifar10 import GetData
-
-images_test, images_train, labels_test, labels_train, input_tensor_shape = GetData()
+from Demos.Datasets.Cifar10 import GetInputShape
+input_tensor_shape = GetInputShape()
 
 if __name__ == "__main__":
     import argparse
@@ -32,6 +31,7 @@ if __name__ == "__main__":
         load_tensorflow_params_from_config,
         set_test_train_data,
         get_global,
+        set_global,
         evaluate_individual,
         mutate_individual,
     )
@@ -48,16 +48,20 @@ if __name__ == "__main__":
     load_genetic_params_from_config(config)
     load_tensorflow_params_from_config(config)
 
+    set_global("input_tensor_shape", input_tensor_shape)
 
-    set_test_train_data(
-        train_data=images_train,
-        train_labels=labels_train,
-        test_data=images_test,
-        test_labels=labels_test,
-        input_tensor_shape=input_tensor_shape,
-        training_sample_size=get_global("training_sample_size"),
-        test_sample_size=get_global("test_sample_size"),
-    )
+    ## Multithreaded programs will want to get dataset data external to the parallelized evaluation step.
+    ## Distributed progrems will want to get dataset data during the distributed evaliations steps such that they have
+    ## local copies of the dataset.
+    if get_global("multithreaded"):
+        from Demos.Datasets.Cifar10 import GetData
+        data = GetData()
+
+        set_test_train_data(
+            **data,
+            training_sample_size=get_global("training_sample_size"),
+            test_sample_size=get_global("test_sample_size"),
+        )
 
     from Demos import gen_classification_ba
 

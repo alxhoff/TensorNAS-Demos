@@ -59,4 +59,11 @@ def GetData():
         label_names,
     ) = load_cifar_10_data(output_dir)
 
-    return test_data, train_data, test_labels, train_labels, test_data[0].shape
+    input_shape = GetInputShape()
+
+    return {"test_data":test_data, "train_data":train_data, "test_labels":test_labels, "train_labels":train_labels,
+            "input_tensor_shape":input_shape}
+
+def GetInputShape():
+
+    return (32,32,3)
