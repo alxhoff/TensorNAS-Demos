@@ -78,9 +78,17 @@ def gen_auc_ba():
         raise e
 
 
-def evaluate_individual(individual, test_name, gen, logger):
+def evaluate_individual(individual, test_name, gen, logger, dataset_lock=None):
     global epochs, batch_size, loss, metrics, images_train, images_test, labels_train, labels_test, train_generator
     global val_generator, test_generator, save_individuals, q_aware, steps_per_epoch, test_sample_size
+
+    if not get_global("multithreaded"):
+        if not any(k in globals() for k in ('train_data', 'train_labels', 'test_data', 'test_labels', 'train_generator',
+                                            'val_generator', 'test_generator')):
+            from Demos.Datasets.Cifar10 import GetData
+            from Demos import set_test_train_data
+
+            set_test_train_data(**GetData())
 
     param_count, accuracy = individual.evaluate(
         train_data=images_train,
@@ -173,6 +181,7 @@ def set_test_train_data(
     input_tensor_shape=None,
     training_sample_size=None,
     test_sample_size=None,
+    **kwargs
 ):
     from Demos import get_global
 
