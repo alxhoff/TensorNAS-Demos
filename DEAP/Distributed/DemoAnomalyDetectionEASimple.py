@@ -1,4 +1,5 @@
 from Demos.Datasets.ToyADMOS import GetData, GetTestData
+
 images_train, input_tensor_shape = GetData()
 test_data, test_labels = GetTestData()
 

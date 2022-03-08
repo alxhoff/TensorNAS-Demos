@@ -15,7 +15,13 @@ def load_genetic_params_from_config(config):
         GetPopulationSize,
         GetGenerationCount,
         GetCrossoverProbability,
+        GetVerboseMutation,
+        GetMutationMethod,
+        GetVariableMutationGenerationalChange,
+        GetMutationAttempts,
+        GetRetrainEveryGeneration,
         GetMutationProbability,
+        GetSelfMutationProbability,
         GetTrainingSampleSize,
         GetTestSampleSize,
         GetGenerationGap,
@@ -24,8 +30,18 @@ def load_genetic_params_from_config(config):
 
     set_global("pop_size", GetPopulationSize(config))
     set_global("gen_count", GetGenerationCount(config))
+    set_global("verbose_mutation", GetVerboseMutation(config))
+    set_global("mutation_attempts", GetMutationAttempts(config))
+    set_global("retrain_every_generation", GetRetrainEveryGeneration(config))
+    mutation_method = GetMutationMethod(config)
+    set_global("mutation_method", mutation_method)
+    set_global(
+        "variable_mutation_generational_change",
+        GetVariableMutationGenerationalChange(config),
+    )
     set_global("cxpb", GetCrossoverProbability(config))
     set_global("mutpb", GetMutationProbability(config))
+    set_global("self_mutation_probability", GetSelfMutationProbability(config))
     set_global("training_sample_size", GetTrainingSampleSize(config))
     set_global("test_sample_size", GetTestSampleSize(config))
     set_global("generation_gap", GetGenerationGap(config))

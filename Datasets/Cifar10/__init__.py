@@ -26,7 +26,7 @@ def GetData():
     if not len(os.listdir(output_dir)):
         import tarfile
 
-        tar_filepath="{}/{}".format(zip_dir, dataset_zip)
+        tar_filepath = "{}/{}".format(zip_dir, dataset_zip)
         print("Extracting Cifar10 tar to: {}".format(tar_filepath))
         tar = tarfile.open(tar_filepath, "r:gz")
         tar.extractall(path=output_dir)
@@ -38,7 +38,9 @@ def GetData():
 
         sub_out_files = os.listdir(os.path.join(output_dir, out_files[0]))
 
-        print("Moving files {} into parent directory {}".format(sub_out_files, output_dir))
+        print(
+            "Moving files {} into parent directory {}".format(sub_out_files, output_dir)
+        )
 
         for file in sub_out_files:
             shutil.move(os.path.join(output_dir, out_files[0], file), output_dir)
@@ -61,9 +63,15 @@ def GetData():
 
     input_shape = GetInputShape()
 
-    return {"test_data":test_data, "train_data":train_data, "test_labels":test_labels, "train_labels":train_labels,
-            "input_tensor_shape":input_shape}
+    return {
+        "test_data": test_data,
+        "train_data": train_data,
+        "test_labels": test_labels,
+        "train_labels": train_labels,
+        "input_tensor_shape": input_shape,
+    }
+
 
 def GetInputShape():
 
-    return (32,32,3)
+    return (32, 32, 3)

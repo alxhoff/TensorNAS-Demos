@@ -1,4 +1,5 @@
 from Demos.Datasets.ToyADMOS import GetData, GetTestData
+
 images_train, input_tensor_shape = GetData()
 test_data, test_labels = GetTestData()
 
@@ -48,8 +49,6 @@ if __name__ == "__main__":
     load_genetic_params_from_config(config)
     load_tensorflow_params_from_config(config)
 
-    from Demos import gen_auc_ba
-
     set_test_train_data(
         train_data=images_train,
         test_data=test_data,
@@ -58,6 +57,22 @@ if __name__ == "__main__":
         training_sample_size=get_global("training_sample_size"),
         test_sample_size=get_global("test_sample_size"),
     )
+
+    ## Multithreaded programs will want to get dataset data external to the parallelized evaluation step.
+    ## Distributed progrems will want to get dataset data during the distributed evaliations steps such that they have
+    ## local copies of the dataset.
+    if get_global("multithreaded"):
+        from Demos.Datasets.Cifar10 import GetData
+
+        data = GetData()
+
+        set_test_train_data(
+            **data,
+            training_sample_size=get_global("training_sample_size"),
+            test_sample_size=get_global("test_sample_size"),
+        )
+
+    from Demos import gen_auc_ba
 
     pop, logbook, test = run_deap_test(
         generate_individual=gen_auc_ba,

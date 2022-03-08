@@ -83,12 +83,26 @@ def evaluate_individual(individual, test_name, gen, logger, dataset_lock=None):
     global val_generator, test_generator, save_individuals, q_aware, steps_per_epoch, test_sample_size
 
     if not get_global("multithreaded"):
-        if not any(k in globals() for k in ('train_data', 'train_labels', 'test_data', 'test_labels', 'train_generator',
-                                            'val_generator', 'test_generator')):
+        if not any(
+            k in globals()
+            for k in (
+                "train_data",
+                "train_labels",
+                "test_data",
+                "test_labels",
+                "train_generator",
+                "val_generator",
+                "test_generator",
+            )
+        ):
             from Demos.Datasets.Cifar10 import GetData
             from Demos import set_test_train_data
 
-            set_test_train_data(**GetData())
+            set_test_train_data(
+                **GetData(),
+                training_sample_size=get_global("training_sample_size"),
+                test_sample_size=get_global("test_sample_size")
+            )
 
     param_count, accuracy = individual.evaluate(
         train_data=images_train,
@@ -107,14 +121,23 @@ def evaluate_individual(individual, test_name, gen, logger, dataset_lock=None):
         q_aware=q_aware,
         logger=logger,
         steps_per_epoch=steps_per_epoch,
-        test_steps=test_sample_size / batch_size,
+        test_steps=test_sample_size // batch_size if batch_size else None,
     )
 
     return param_count, accuracy
 
 
 def mutate_individual(individual):
-    return (individual.mutate(),)
+    from Demos import get_global
+
+    verbose = get_global("verbose_mutation")
+    individual.mutate(
+        verbose=verbose,
+        mutate_equally=get_global("mutation_method"),
+        mutation_probability=get_global("self_mutation_probability"),
+    )
+
+    return (individual,)
 
 
 def load_globals_from_config(config):
@@ -169,6 +192,13 @@ def load_globals_from_config(config):
         except Exception as e:
             raise e
 
+    if not globals()["verbose"]:
+        import os
+        import tensorflow as tf
+
+        tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+        os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # FATAL
+
 
 def set_test_train_data(
     train_data=None,
@@ -188,7 +218,7 @@ def set_test_train_data(
     globals()["train_generator"] = train_generator
     globals()["val_generator"] = val_generator
     globals()["test_generator"] = test_generator
-    steps = 0
+    steps = None
     batch_size = get_global("batch_size")
 
     if all(
@@ -198,7 +228,6 @@ def set_test_train_data(
             (train_labels is not None),
         ]
     ):
-        steps = training_sample_size // batch_size
         globals()["images_train"] = train_data[:training_sample_size]
         globals()["labels_train"] = train_labels[:training_sample_size]
     else:
@@ -220,7 +249,8 @@ def set_test_train_data(
 
     if train_generator:
         try:
-            steps = training_sample_size // batch_size
+            if batch_size:
+                steps = training_sample_size // batch_size
         except Exception as e:
             raise Exception(
                 "Training sample size or batch size not set properly, '{}'".format(e)

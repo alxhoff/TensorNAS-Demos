@@ -48,7 +48,6 @@ if __name__ == "__main__":
     load_genetic_params_from_config(config)
     load_tensorflow_params_from_config(config)
 
-
     set_test_train_data(
         train_data=images_train,
         train_labels=labels_train,

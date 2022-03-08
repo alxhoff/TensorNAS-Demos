@@ -1,4 +1,5 @@
 from Demos.Datasets.Cifar10 import GetInputShape
+
 input_tensor_shape = GetInputShape()
 
 if __name__ == "__main__":
@@ -55,6 +56,7 @@ if __name__ == "__main__":
     ## local copies of the dataset.
     if get_global("multithreaded"):
         from Demos.Datasets.Cifar10 import GetData
+
         data = GetData()
 
         set_test_train_data(
