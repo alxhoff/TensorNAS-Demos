@@ -80,7 +80,7 @@ def gen_auc_ba():
 
 def evaluate_individual(individual, test_name, gen, logger, dataset_lock=None):
     global epochs, batch_size, loss, metrics, images_train, images_test, labels_train, labels_test, train_generator
-    global val_generator, test_generator, save_individuals, q_aware, steps_per_epoch, test_sample_size
+    global val_generator, test_generator, save_individuals, q_aware, steps_per_epoch, test_sample_size, early_stopper
 
     if not get_global("multithreaded"):
         if not any(
@@ -122,6 +122,7 @@ def evaluate_individual(individual, test_name, gen, logger, dataset_lock=None):
         logger=logger,
         steps_per_epoch=steps_per_epoch,
         test_steps=test_sample_size // batch_size if batch_size else None,
+        early_stopper=early_stopper,
     )
 
     return param_count, accuracy
@@ -129,13 +130,37 @@ def evaluate_individual(individual, test_name, gen, logger, dataset_lock=None):
 
 def mutate_individual(individual):
     from Demos import get_global
+    from copy import deepcopy
 
     verbose = get_global("verbose_mutation")
-    individual.mutate(
-        verbose=verbose,
-        mutate_equally=get_global("mutation_method"),
-        mutation_probability=get_global("self_mutation_probability"),
-    )
+    mutation_attempts = get_global("mutation_attempts")
+    loss = get_global("loss")
+    metrics = get_global("metrics")
+    attempts = 0
+    mutated = False
+
+    while attempts < mutation_attempts and mutated == False:
+        try:
+            attempt = deepcopy(individual.block_architecture)
+            attempt.mutate(
+                verbose=verbose,
+                mutate_equally=get_global("mutation_method"),
+                mutation_probability=get_global("self_mutation_probability"),
+            )
+            model = attempt.get_keras_model(loss=loss, metrics=metrics)
+            if model == None:
+                raise Exception("Getting mutated model failed")
+            mutated = True
+        except Exception as e:
+            if verbose:
+                print("Mutation attempt #{} failed:".format(attempts + 1, e))
+            pass
+        attempts += 1
+
+    if mutated:
+        if verbose:
+            print("Mutated successfully")
+        individual.block_architecture = attempt
 
     return (individual,)
 
@@ -221,6 +246,12 @@ def set_test_train_data(
     steps = None
     batch_size = get_global("batch_size")
 
+    if training_sample_size == 0:
+        training_sample_size = None
+
+    if test_sample_size == 0:
+        test_sample_size = None
+
     if all(
         [
             (training_sample_size is not None),
@@ -270,6 +301,7 @@ def load_tensorflow_params_from_config(config):
         GetTFQuantizationAware,
         GetTrainingSampleSize,
         GetTestSampleSize,
+        GetTFEarlyStopper,
     )
 
     globals()["epochs"] = GetTFEpochs(config)
@@ -280,6 +312,7 @@ def load_tensorflow_params_from_config(config):
     globals()["q_aware"] = GetTFQuantizationAware(config)
     globals()["training_sample_size"] = GetTrainingSampleSize(config)
     globals()["test_sample_size"] = GetTestSampleSize(config)
+    globals()["early_stopper"] = GetTFEarlyStopper(config)
 
 
 def get_global(var_name):
