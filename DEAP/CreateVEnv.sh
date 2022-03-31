@@ -41,6 +41,7 @@ echo "Cloning TensorNAS source"
 if [ -d "$directory/TensorNAS-Project" ]; then
   echo "TensorNAS found, checking that it is recent"
   cd $directory/TensorNAS-Project
+  git submodule foreach git stash
   git submodule foreach git pull origin master
 else
   echo "TensorNAS not found, cloning"
