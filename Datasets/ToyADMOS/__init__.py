@@ -165,10 +165,21 @@ def GetData():
     # read in WAV files from disk
     data_set = read_in_dataset(data_dir)
 
-    return data_set, data_set[0].shape
+    test_data, test_labels = _GetTestData()
+
+    return {
+        "train_data": data_set,
+        "test_data": test_data,
+        "test_labels": test_labels,
+        "input_tensor_shape": data_set[0].shape,
+    }
+
+def GetInputShape():
+
+    return (640,)
 
 
-def GetTestData():
+def _GetTestData():
     from Demos.Datasets.ToyADMOS.common import (
         test_file_list_generator,
         get_machine_id_list_for_test,

@@ -1,9 +1,22 @@
-from Demos.Datasets.Cifar10 import GetInputShape
-
-input_tensor_shape = GetInputShape()
-
 if __name__ == "__main__":
+
     import argparse
+
+    from Demos import (
+        load_globals_from_config,
+        load_tensorflow_params_from_config,
+        set_test_train_data,
+        get_global,
+        set_global,
+        evaluate_individual,
+        mutate_individual,
+    )
+    from Demos.DEAP import (
+        load_genetic_params_from_config,
+        run_deap_test,
+        get_config,
+    )
+    from TensorNAS.Core.Crossover import crossover_individuals_sp
 
     parser = argparse.ArgumentParser()
 
@@ -25,39 +38,21 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    args.config = "DemoImageClassificationEASimple"
-
-    from Demos import (
-        load_globals_from_config,
-        load_tensorflow_params_from_config,
-        set_test_train_data,
-        get_global,
-        set_global,
-        evaluate_individual,
-        mutate_individual,
-    )
-    from Demos.DEAP import (
-        load_genetic_params_from_config,
-        run_deap_test,
-        get_config,
-    )
-    from TensorNAS.Core.Crossover import crossover_individuals_sp
-
     config = get_config(args=args)
 
     load_globals_from_config(config)
     load_genetic_params_from_config(config)
     load_tensorflow_params_from_config(config)
 
-    set_global("input_tensor_shape", input_tensor_shape)
+    dataset_module = get_global("dataset_module")
+    set_global("input_tensor_shape", dataset_module.GetInputShape())
 
     ## Multithreaded programs will want to get dataset data external to the parallelized evaluation step.
     ## Distributed progrems will want to get dataset data during the distributed evaliations steps such that they have
     ## local copies of the dataset.
     if get_global("multithreaded"):
-        from Demos.Datasets.Cifar10 import GetData
 
-        data = GetData()
+        data = dataset_module.GetData()
 
         set_test_train_data(
             **data,
@@ -65,10 +60,10 @@ if __name__ == "__main__":
             test_sample_size=get_global("test_sample_size"),
         )
 
-    from Demos import gen_classification_ba
+    gba = get_global("gen_block_architecture")
 
     pop, logbook, test = run_deap_test(
-        generate_individual=gen_classification_ba,
+        generate_individual=gba,
         evaluate_individual=evaluate_individual,
         crossover=crossover_individuals_sp,
         mutate=mutate_individual,

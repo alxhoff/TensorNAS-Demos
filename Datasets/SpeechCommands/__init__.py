@@ -27,4 +27,14 @@ def GetData():
 
     shape = tuple(tf.compat.v1.data.get_output_shapes(ds_train)[0].as_list()[1:])
 
-    return ds_train, ds_val, ds_test, shape, train_len, val_len, test_len
+    return {
+        "train_generator": ds_train,
+        "val_generator": ds_val,
+        "test_generator": ds_test,
+        "input_tensor_shape": shape,
+    }
+
+
+def GetInputShape():
+
+    return (49, 10, 1)

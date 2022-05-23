@@ -1,8 +1,6 @@
 def GetData():
     import tensorflow as tf
 
-    mnist_dataset = tf.keras.datasets.mnist
-
     (
         (images_train, labels_train),
         (images_test, labels_test),
@@ -20,4 +18,15 @@ def GetData():
     images_train /= 255
     images_test /= 255
 
-    return images_train, images_test, labels_train, labels_test, input_tensor_shape
+    return {
+        "train_data": images_train,
+        "test_data": images_test,
+        "train_labels": labels_train,
+        "test_labels": labels_test,
+        "input_tensor_shape": input_tensor_shape,
+    }
+
+
+def GetInputShape():
+
+    return (28, 28, 1)

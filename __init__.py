@@ -78,9 +78,10 @@ def gen_auc_ba():
         raise e
 
 
-def evaluate_individual(individual, test_name, gen, logger, dataset_lock=None):
+def evaluate_individual(individual, test_name, gen, logger):
     global epochs, batch_size, loss, metrics, images_train, images_test, labels_train, labels_test, train_generator
     global val_generator, test_generator, save_individuals, q_aware, steps_per_epoch, test_sample_size, early_stopper
+    global dataset_module, patience
 
     if not get_global("multithreaded"):
         if not any(
@@ -95,11 +96,10 @@ def evaluate_individual(individual, test_name, gen, logger, dataset_lock=None):
                 "test_generator",
             )
         ):
-            from Demos.Datasets.Cifar10 import GetData
             from Demos import set_test_train_data
 
             set_test_train_data(
-                **GetData(),
+                **dataset_module.GetData(),
                 training_sample_size=get_global("training_sample_size"),
                 test_sample_size=get_global("test_sample_size")
             )
@@ -123,13 +123,13 @@ def evaluate_individual(individual, test_name, gen, logger, dataset_lock=None):
         steps_per_epoch=steps_per_epoch,
         test_steps=test_sample_size // batch_size if batch_size else None,
         early_stopper=early_stopper,
+        patience=patience
     )
 
     return param_count, accuracy
 
 
 def mutate_individual(individual):
-    from Demos import get_global
     from copy import deepcopy
 
     verbose = get_global("verbose_mutation")
@@ -138,20 +138,24 @@ def mutate_individual(individual):
     metrics = get_global("metrics")
     attempts = 0
     mutated = False
+    mutation_operation, mutation_note, mutation_table_references = None, None, None
 
     while attempts < mutation_attempts and mutated == False:
         try:
             attempt = deepcopy(individual.block_architecture)
-            attempt.mutate(
+            mutation_operation, mutation_note, mutation_table_references = attempt.mutate(
                 verbose=verbose,
                 mutate_equally=get_global("mutation_method"),
                 mutation_probability=get_global("self_mutation_probability"),
             )
+
             model = attempt.get_keras_model(loss=loss, metrics=metrics)
             if model == None:
                 raise Exception("Getting mutated model failed")
             mutated = True
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             if verbose:
                 print("Mutation attempt #{} failed:".format(attempts + 1, e))
             pass
@@ -161,6 +165,9 @@ def mutate_individual(individual):
         if verbose:
             print("Mutated successfully")
         individual.block_architecture = attempt
+        from TensorNAS.Core.BlockArchitecture import Mutation
+        individual.block_architecture.mutations.append(Mutation(mutation_table_references=mutation_table_references,
+                                                                mutation_function=mutation_operation, mutation_note=mutation_note))
 
     return (individual,)
 
@@ -173,6 +180,8 @@ def load_globals_from_config(config):
         GetVerbose,
         GetMultithreaded,
         GetDistributed,
+        GetDatasetModule,
+        GetGenBlockArchitecture,
         GetThreadCount,
         GetGPU,
         GetSaveIndividual,
@@ -190,6 +199,20 @@ def load_globals_from_config(config):
     globals()["verbose"] = GetVerbose(config)
     globals()["multithreaded"] = GetMultithreaded(config)
     globals()["distributed"] = GetDistributed(config)
+    dm = GetDatasetModule(config)
+    components = dm.split(".")
+    dm = __import__(dm)
+    for comp in components[1:]:
+        dm = getattr(dm, comp)
+    globals()["dataset_module"] = dm
+    gba = GetGenBlockArchitecture(config)
+    components = gba.split(".")
+    # fund = components[-1]
+    module = ".".join(components[:-1])
+    gba = __import__(module)
+    for comp in components[1:-1]:
+        gba = getattr(gba, comp)
+    globals()["gen_block_architecture"] = eval("gba.{}".format(components[-1]))
     globals()["thread_count"] = GetThreadCount(config)
     globals()["use_gpu"] = GetGPU(config)
     globals()["save_individuals"] = GetSaveIndividual(config)
@@ -238,8 +261,6 @@ def set_test_train_data(
     test_sample_size=None,
     **kwargs
 ):
-    from Demos import get_global
-
     globals()["train_generator"] = train_generator
     globals()["val_generator"] = val_generator
     globals()["test_generator"] = test_generator
@@ -302,6 +323,7 @@ def load_tensorflow_params_from_config(config):
         GetTrainingSampleSize,
         GetTestSampleSize,
         GetTFEarlyStopper,
+        GetTFPatience
     )
 
     globals()["epochs"] = GetTFEpochs(config)
@@ -313,7 +335,8 @@ def load_tensorflow_params_from_config(config):
     globals()["training_sample_size"] = GetTrainingSampleSize(config)
     globals()["test_sample_size"] = GetTestSampleSize(config)
     globals()["early_stopper"] = GetTFEarlyStopper(config)
-
+    if globals()["early_stopper"]:
+        globals()["patience"] = GetTFPatience(config)
 
 def get_global(var_name):
     try:
