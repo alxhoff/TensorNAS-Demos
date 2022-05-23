@@ -52,15 +52,16 @@ fi
 echo "Create symlinks for demos"
 cd $directory
 
-echo "ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS"
-ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS
-ln -sf $directory/TensorNAS-Project/Demos $directory/TensorNAS-Project/Demos/DEAP/Distributed/Demos
+#echo "ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS"
+#ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Distributed/TensorNAS
+#ln -sf $directory/TensorNAS-Project/Demos $directory/TensorNAS-Project/Demos/DEAP/Distributed/Demos
+#
+#echo "ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS"
+#ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS
+#ln -sf $directory/TensorNAS-Project/Demos $directory/TensorNAS-Project/Demos/DEAP/Standalone/Demos
 
-echo "ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS"
-ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Standalone/TensorNAS
-ln -sf $directory/TensorNAS-Project/Demos $directory/TensorNAS-Project/Demos/DEAP/Standalone/Demos
-
-echo "ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/Standalone/TensorNAS"
-ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/Standalone/TensorNAS
-ln -sf $directory/TensorNAS-Project/Demos $directory/TensorNAS-Project/Demos/Standalone/Demos
+echo "ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/TensorNAS"
+ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/TensorNAS
+echo "ln -sf $directory/TensorNAS-Project/TensorNAS $directory/TensorNAS-Project/Demos/DEAP/Demos"
+ln -sf $directory/TensorNAS-Project/Demos $directory/TensorNAS-Project/Demos/DEAP/Demos
 
