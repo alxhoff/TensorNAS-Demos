@@ -50,7 +50,7 @@ if __name__ == "__main__":
     ## Multithreaded programs will want to get dataset data external to the parallelized evaluation step.
     ## Distributed progrems will want to get dataset data during the distributed evaliations steps such that they have
     ## local copies of the dataset.
-    if get_global("multithreaded"):
+    if get_global("multithreaded") or not get_global("local_dataset"):
 
         data = dataset_module.GetData()
 

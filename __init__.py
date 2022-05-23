@@ -123,7 +123,7 @@ def evaluate_individual(individual, test_name, gen, logger):
         steps_per_epoch=steps_per_epoch,
         test_steps=test_sample_size // batch_size if batch_size else None,
         early_stopper=early_stopper,
-        patience=patience
+        patience=patience,
     )
 
     return param_count, accuracy
@@ -143,7 +143,11 @@ def mutate_individual(individual):
     while attempts < mutation_attempts and mutated == False:
         try:
             attempt = deepcopy(individual.block_architecture)
-            mutation_operation, mutation_note, mutation_table_references = attempt.mutate(
+            (
+                mutation_operation,
+                mutation_note,
+                mutation_table_references,
+            ) = attempt.mutate(
                 verbose=verbose,
                 mutate_equally=get_global("mutation_method"),
                 mutation_probability=get_global("self_mutation_probability"),
@@ -155,6 +159,7 @@ def mutate_individual(individual):
             mutated = True
         except Exception as e:
             import traceback
+
             traceback.print_exc()
             if verbose:
                 print("Mutation attempt #{} failed:".format(attempts + 1, e))
@@ -166,8 +171,14 @@ def mutate_individual(individual):
             print("Mutated successfully")
         individual.block_architecture = attempt
         from TensorNAS.Core.BlockArchitecture import Mutation
-        individual.block_architecture.mutations.append(Mutation(mutation_table_references=mutation_table_references,
-                                                                mutation_function=mutation_operation, mutation_note=mutation_note))
+
+        individual.block_architecture.mutations.append(
+            Mutation(
+                mutation_table_references=mutation_table_references,
+                mutation_function=mutation_operation,
+                mutation_note=mutation_note,
+            )
+        )
 
     return (individual,)
 
@@ -181,6 +192,7 @@ def load_globals_from_config(config):
         GetMultithreaded,
         GetDistributed,
         GetDatasetModule,
+        GetLocalDataset,
         GetGenBlockArchitecture,
         GetThreadCount,
         GetGPU,
@@ -205,6 +217,7 @@ def load_globals_from_config(config):
     for comp in components[1:]:
         dm = getattr(dm, comp)
     globals()["dataset_module"] = dm
+    globals()["local_dataset"] = GetLocalDataset(config)
     gba = GetGenBlockArchitecture(config)
     components = gba.split(".")
     # fund = components[-1]
@@ -323,7 +336,7 @@ def load_tensorflow_params_from_config(config):
         GetTrainingSampleSize,
         GetTestSampleSize,
         GetTFEarlyStopper,
-        GetTFPatience
+        GetTFPatience,
     )
 
     globals()["epochs"] = GetTFEpochs(config)
@@ -337,6 +350,7 @@ def load_tensorflow_params_from_config(config):
     globals()["early_stopper"] = GetTFEarlyStopper(config)
     if globals()["early_stopper"]:
         globals()["patience"] = GetTFPatience(config)
+
 
 def get_global(var_name):
     try:

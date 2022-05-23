@@ -174,6 +174,7 @@ def GetData():
         "input_tensor_shape": data_set[0].shape,
     }
 
+
 def GetInputShape():
 
     return (640,)

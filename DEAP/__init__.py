@@ -26,7 +26,7 @@ def load_genetic_params_from_config(config):
         GetTestSampleSize,
         GetGenerationGap,
         GetGenerationSaveInterval,
-    GetAlpha
+        GetAlpha,
     )
 
     set_global("pop_size", GetPopulationSize(config))
@@ -48,6 +48,7 @@ def load_genetic_params_from_config(config):
     set_global("generation_gap", GetGenerationGap(config))
     set_global("generation_save_interval", GetGenerationSaveInterval(config))
     set_global("alpha", GetAlpha(config))
+
 
 def run_deap_test(generate_individual, evaluate_individual, crossover, mutate):
     from importlib import import_module
