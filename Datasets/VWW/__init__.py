@@ -266,7 +266,11 @@ def GetData():
     )
     print(train_generator.class_indices)
 
-    return train_generator, val_generator, train_generator.image_shape
+    return {
+        "train_generator": train_generator,
+        "val_generator": val_generator,
+        "input_tensor_shape": train_generator.image_shape,
+    }
 
 
 def resize_save_image(image, save_index, out_dir):

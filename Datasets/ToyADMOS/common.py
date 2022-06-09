@@ -354,8 +354,8 @@ def test_file_list_generator(
             )
         )
         anomaly_labels = numpy.ones(len(anomaly_files))
-        files = numpy.concatenate((normal_files, anomaly_files), axis=0)
-        labels = numpy.concatenate((normal_labels, anomaly_labels), axis=0)
+        files = numpy.concatenate((normal_files, anomaly_files))
+        labels = numpy.concatenate((normal_labels, anomaly_labels))
         logger.info("test_file  num : {num}".format(num=len(files)))
         if len(files) == 0:
             logger.exception("no_wav_file!!")

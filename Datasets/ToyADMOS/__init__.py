@@ -1,6 +1,7 @@
 import os
-
 import numpy as np
+
+from Demos.Datasets import tmp_dir
 
 ToyCar_download_prefix = "https://zenodo.org/record/3678171/files/"
 ToyCar_zipfile = "dev_data_ToyCar.zip"
@@ -9,9 +10,6 @@ download_suffix = "?download=1"
 
 
 def _create_subdirs(parent_dir):
-
-    # train
-    from Demos import tmp_dir
 
     parent_dir = os.path.join(tmp_dir, parent_dir)
     train_dir = parent_dir + "/train_normal"
@@ -134,7 +132,7 @@ def read_in_dataset(data_dir):
 
     param = yaml_load()
 
-    files = file_list_generator(data_dir)
+    files = file_list_generator(data_dir)[:2000]
     train_data = list_to_vector_array(
         files,
         msg="generate train_dataset",
@@ -163,15 +161,16 @@ def GetData():
     data_dir = _unzip_zips(dataset_zips, dataset_name)
 
     # read in WAV files from disk
-    data_set = read_in_dataset(data_dir)
+    data_set_x = read_in_dataset(data_dir)
 
     test_data, test_labels = _GetTestData()
 
     return {
-        "train_data": data_set,
+        "train_data": data_set_x,
+        "train_labels": data_set_x,
         "test_data": test_data,
         "test_labels": test_labels,
-        "input_tensor_shape": data_set[0].shape,
+        "input_tensor_shape": data_set_x[0].shape,
     }
 
 
@@ -190,6 +189,8 @@ def _GetTestData():
     from Demos.Datasets import tmp_dir
     import os
 
+    print("Getting Test Data")
+
     dataset_dir = os.path.join(tmp_dir, "ToyCar")
     machine_ids = get_machine_id_list_for_test(dataset_dir)
 
@@ -198,7 +199,7 @@ def _GetTestData():
     test_files = []
     y_true = []
 
-    for id in machine_ids:
+    for id in machine_ids[0]:
         tf, yt = test_file_list_generator(dataset_dir, id, True)
         test_files.append(tf)
         y_true.append(yt)
@@ -207,16 +208,21 @@ def _GetTestData():
     y_true = np.concatenate(y_true)
 
     test_data = []
-    for tf in test_files:
-        test_data.append(
-            file_to_vector_array(
-                tf,
-                n_mels=param["feature"]["n_mels"],
-                frames=param["feature"]["frames"],
-                n_fft=param["feature"]["n_fft"],
-                hop_length=param["feature"]["hop_length"],
-                power=param["feature"]["power"],
-            )
+    yt = []
+    for f, y in zip(test_files, y_true):
+        data = file_to_vector_array(
+            f,
+            n_mels=param["feature"]["n_mels"],
+            frames=param["feature"]["frames"],
+            n_fft=param["feature"]["n_fft"],
+            hop_length=param["feature"]["hop_length"],
+            power=param["feature"]["power"],
         )
+        # y_true = np.repeat(y, len(data))
+        test_data.append(data)
+        yt.append(y)
 
-    return test_data, y_true
+    # test_data = np.concatenate(test_data, axis=0)
+    # yt = np.concatenate(yt, axis=0)
+
+    return test_data, yt

@@ -1,3 +1,7 @@
+import math
+import tensorflow as tf
+
+
 def get_config(args=None):
     from time import gmtime, strftime
     from TensorNAS.Tools.ConfigParse import (
@@ -79,39 +83,31 @@ def gen_auc_ba():
 
 
 def evaluate_individual(individual, test_name, gen, logger):
-    global epochs, batch_size, loss, metrics, images_train, images_test, labels_train, labels_test, train_generator
-    global val_generator, test_generator, save_individuals, q_aware, steps_per_epoch, test_sample_size, early_stopper
-    global dataset_module, patience
+    global epochs, batch_size, loss, metrics, train_generator, validation_generator
+    global test_generator, save_individuals, q_aware, steps_per_epoch, batch_size
+    global dataset_module, verbose, train_len, test_len, validation_split, validation_len
 
     if not get_global("multithreaded"):
         if not any(
             k in globals()
-            for k in (
-                "train_data",
-                "train_labels",
-                "test_data",
-                "test_labels",
-                "train_generator",
-                "val_generator",
-                "test_generator",
-            )
+            for k in ("train_generator", "train_len" "test_generator", "test_len")
         ):
             from Demos import set_test_train_data
 
             set_test_train_data(
                 **dataset_module.GetData(),
+                validation_split=validation_split,
                 training_sample_size=get_global("training_sample_size"),
-                test_sample_size=get_global("test_sample_size")
+                test_sample_size=get_global("test_sample_size"),
+                batch_size=batch_size,
             )
 
     param_count, accuracy = individual.evaluate(
-        train_data=images_train,
-        train_labels=labels_train,
-        test_data=images_test,
-        test_labels=labels_test,
         train_generator=train_generator,
-        validation_generator=val_generator,
+        train_len=train_len,
         test_generator=test_generator,
+        validation_generator=validation_generator,
+        validation_len=validation_len,
         epochs=epochs,
         batch_size=batch_size,
         loss=loss,
@@ -120,10 +116,7 @@ def evaluate_individual(individual, test_name, gen, logger):
         model_name="{}/{}".format(gen, individual.index),
         q_aware=q_aware,
         logger=logger,
-        steps_per_epoch=steps_per_epoch,
-        test_steps=test_sample_size // batch_size if batch_size else None,
-        early_stopper=early_stopper,
-        patience=patience,
+        verbose=verbose,
     )
 
     return param_count, accuracy
@@ -261,68 +254,129 @@ def load_globals_from_config(config):
         os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # FATAL
 
 
+class DataGenerator(tf.keras.utils.Sequence):
+    """
+    See https://towardsdatascience.com/writing-custom-keras-generators-fe815d992c5a
+    https://medium.com/analytics-vidhya/write-your-own-custom-data-generator-for-tensorflow-keras-1252b64e41c3
+    https://stackoverflow.com/questions/62916904/failed-copying-input-tensor-from-cpu-to-gpu-in-order-to-run-gatherve-dst-tensor
+    """
+
+    def __init__(self, x_set, y_set, batch_size=1):
+
+        assert len(x_set) == len(
+            y_set
+        ), "Arrays passed to DataGenerator have different lengths"
+
+        self.x, self.y = x_set, y_set
+        self.batch_size = batch_size
+
+        self.n = len(x_set)
+
+    def __len__(self):
+        return len(self.x) // self.batch_size
+
+    def __getitem__(self, item):
+
+        batch_x = self.x[item * self.batch_size : (item + 1) * self.batch_size]
+        batch_y = self.y[item * self.batch_size : (item + 1) * self.batch_size]
+
+        return batch_x, batch_y
+
+
+def _convert_array_to_datagen(array_x, array_y, batch_size=1):
+
+    return DataGenerator(array_x, array_y, batch_size)
+
+
 def set_test_train_data(
     train_data=None,
     train_labels=None,
     test_data=None,
     test_labels=None,
     train_generator=None,
-    val_generator=None,
+    train_len=None,
     test_generator=None,
+    test_len=None,
+    val_generator=None,
+    val_len=None,
+    validation_split=None,
+    batch_size=1,
     input_tensor_shape=None,
     training_sample_size=None,
     test_sample_size=None,
     **kwargs
 ):
-    globals()["train_generator"] = train_generator
-    globals()["val_generator"] = val_generator
-    globals()["test_generator"] = test_generator
-    steps = None
-    batch_size = get_global("batch_size")
-
-    if training_sample_size == 0:
-        training_sample_size = None
-
-    if test_sample_size == 0:
-        test_sample_size = None
-
+    # TensorNAS only accepts DataGenerators, thus if data is provided as arrays then they must be
+    # converted to custom DataGenerators that can hold whatever format the data is,
+    # ie. potentially not images. Training using a DataGenerator does not support a validation_split thus
+    # if a DataGenerator is to be created from a training data array it must also produce a val_generator
+    # if one is not already been provided.
     if all(
         [
-            (training_sample_size is not None),
             (train_data is not None),
             (train_labels is not None),
-        ]
-    ):
-        globals()["images_train"] = train_data[:training_sample_size]
-        globals()["labels_train"] = train_labels[:training_sample_size]
-    else:
-        globals()["images_train"] = train_data
-        globals()["labels_train"] = train_labels
-
-    if all(
-        [
-            (test_sample_size is not None),
             (test_data is not None),
             (test_labels is not None),
         ]
     ):
-        globals()["images_test"] = test_data[:test_sample_size]
-        globals()["labels_test"] = test_labels[:test_sample_size]
-    else:
-        globals()["images_test"] = test_data
-        globals()["labels_test"] = test_labels
+        train_len = len(train_data)
+        test_len = len(test_data)
 
-    if train_generator:
-        try:
-            if batch_size:
-                steps = training_sample_size // batch_size
-        except Exception as e:
-            raise Exception(
-                "Training sample size or batch size not set properly, '{}'".format(e)
-            )
+        # Set required dataset lengths
+        if training_sample_size is not None:
+            if training_sample_size > 0:
+                if training_sample_size > train_len:
+                    training_sample_size = train_len
+                train_len = training_sample_size
+
+        train_data = train_data[:train_len]
+        train_labels = train_labels[:train_len]
+
+        if test_sample_size is not None:
+            if test_sample_size > 0:
+                if test_sample_size > test_len:
+                    test_sample_size = test_len
+                test_len = test_sample_size
+
+        # Cut datasets down to size
+        test_data = test_data[:test_len]
+        test_labels = test_labels[:test_len]
+
+        # Split training data for validation data
+        train_len = math.floor(len(train_data) * (1 - validation_split))
+        test_len = len(test_data)
+        val_len = math.floor(len(train_data) * validation_split)
+
+        # Create validation generator
+        globals()["validation_generator"] = DataGenerator(
+            x_set=train_data[train_len:],
+            y_set=train_labels[train_len:],
+            batch_size=batch_size,
+        )
+        globals()["validation_len"] = val_len
+
+        # Resize training dataset now that validation data has been removed and used
+        train_data = train_data[:train_len]
+        train_labels = train_labels[:train_len]
+
+        globals()["train_generator"] = DataGenerator(
+            x_set=train_data, y_set=train_labels, batch_size=batch_size
+        )
+        globals()["test_generator"] = DataGenerator(
+            x_set=test_data, y_set=test_labels, batch_size=1
+        )
+        globals()["train_len"] = train_len
+        globals()["test_len"] = test_len
+
+    else:
+        globals()["train_generator"] = train_generator
+        globals()["train_len"] = train_len
+        globals()["test_generator"] = test_generator
+        globals()["test_len"] = test_len
+        globals()["validation_generator"] = val_generator
+        globals()["validation_len"] = val_len
 
     globals()["input_tensor_shape"] = input_tensor_shape
-    globals()["steps_per_epoch"] = steps
 
 
 def load_tensorflow_params_from_config(config):
@@ -335,8 +389,22 @@ def load_tensorflow_params_from_config(config):
         GetTFQuantizationAware,
         GetTrainingSampleSize,
         GetTestSampleSize,
+        GetValidationSplit,
         GetTFEarlyStopper,
         GetTFPatience,
+        GetTFStopperMonitor,
+        GetTFStopperMinDelta,
+        GetTFStopperMode,
+        GetUseLRScheduler,
+        GetLRScheduler,
+        GetLRInitialLearningRate,
+        GetLRDecayPerEpoch,
+        UseImageDataGenerator,
+        GetRotationRange,
+        GetWidthShiftRange,
+        GetHeightShiftRange,
+        GetHorizontalFlip,
+        GetImageDataGeneratorValidationSplit,
     )
 
     globals()["epochs"] = GetTFEpochs(config)
@@ -347,9 +415,28 @@ def load_tensorflow_params_from_config(config):
     globals()["q_aware"] = GetTFQuantizationAware(config)
     globals()["training_sample_size"] = GetTrainingSampleSize(config)
     globals()["test_sample_size"] = GetTestSampleSize(config)
+    globals()["validation_split"] = GetValidationSplit(config)
     globals()["early_stopper"] = GetTFEarlyStopper(config)
     if globals()["early_stopper"]:
         globals()["patience"] = GetTFPatience(config)
+        globals()["stopper_monitor"] = GetTFStopperMonitor(config)
+        globals()["stopper_min_delta"] = GetTFStopperMinDelta(config)
+        globals()["stopper_mode"] = GetTFStopperMode(config)
+    globals()["use_lrscheduler"] = GetUseLRScheduler(config)
+    if globals()["use_lrscheduler"]:
+        globals()["lrscheduler"] = GetLRScheduler(config)
+        globals()["initial_learning_rate"] = GetLRInitialLearningRate(config)
+        globals()["decay_per_epoch"] = GetLRDecayPerEpoch(config)
+
+    globals()["use_image_data_generator"] = UseImageDataGenerator(config)
+    if globals()["use_image_data_generator"]:
+        globals()["rotation_range"] = GetRotationRange(config)
+        globals()["width_shift_range"] = GetWidthShiftRange(config)
+        globals()["height_shift_range"] = GetHeightShiftRange(config)
+        globals()["horizontal_flip"] = GetHorizontalFlip(config)
+        globals()[
+            "image_data_generator_validation_split"
+        ] = GetImageDataGeneratorValidationSplit(config)
 
 
 def get_global(var_name):

@@ -15,22 +15,21 @@ def GetData():
 
     ds_train, ds_test, ds_val = get_training_data(Flags)
 
-    train_len = len(ds_train)
-    val_len = len(ds_val)
-    test_len = len(ds_test)
-
     ds_train = ds_train.repeat()
-    ds_val = ds_val.repeat()
     ds_test = ds_test.repeat()
+
+    train_len = 85511
+    test_len = 4890
 
     import tensorflow as tf
 
     shape = tuple(tf.compat.v1.data.get_output_shapes(ds_train)[0].as_list()[1:])
 
     return {
-        "train_generator": ds_train,
-        "val_generator": ds_val,
+        "train_generator_x": ds_train,
+        "train_len": train_len,
         "test_generator": ds_test,
+        "test_len": test_len,
         "input_tensor_shape": shape,
     }
 

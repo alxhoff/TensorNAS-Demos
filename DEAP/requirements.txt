@@ -9,3 +9,5 @@ pydub
 scipy
 librosa
 pyyaml
+tqdm
+googleapis-common-protos

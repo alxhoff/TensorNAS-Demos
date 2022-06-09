@@ -58,6 +58,7 @@ if __name__ == "__main__":
             **data,
             training_sample_size=get_global("training_sample_size"),
             test_sample_size=get_global("test_sample_size"),
+            batch_size=get_global("batch_size"),
         )
 
     gba = get_global("gen_block_architecture")
