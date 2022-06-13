@@ -54,6 +54,7 @@ if __name__ == "__main__":
             **dataset_module.GetData(),
             training_sample_size=get_global("training_sample_size"),
             test_sample_size=get_global("test_sample_size"),
+            validation_sample_size=get_global("validation_sample_size"),
             batch_size=get_global("batch_size"),
         )
 

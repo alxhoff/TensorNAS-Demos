@@ -84,7 +84,7 @@ def gen_auc_ba():
 
 def evaluate_individual(individual, test_name, gen, logger):
     global epochs, batch_size, loss, metrics, train_generator, validation_generator
-    global test_generator, save_individuals, q_aware, steps_per_epoch, batch_size
+    global test_generator, save_individuals, q_aware, steps_per_epoch, batch_size, test_len
     global dataset_module, verbose, train_len, test_len, validation_split, validation_len
 
     if not get_global("multithreaded"):
@@ -106,6 +106,7 @@ def evaluate_individual(individual, test_name, gen, logger):
         train_generator=train_generator,
         train_len=train_len,
         test_generator=test_generator,
+        test_len=test_len,
         validation_generator=validation_generator,
         validation_len=validation_len,
         epochs=epochs,
@@ -304,6 +305,7 @@ def set_test_train_data(
     input_tensor_shape=None,
     training_sample_size=None,
     test_sample_size=None,
+    validation_sample_size=None,
     **kwargs
 ):
     # TensorNAS only accepts DataGenerators, thus if data is provided as arrays then they must be
@@ -347,6 +349,12 @@ def set_test_train_data(
         test_len = len(test_data)
         val_len = math.floor(len(train_data) * validation_split)
 
+        if validation_sample_size is not None:
+            if validation_sample_size > 0:
+                if validation_sample_size > val_len:
+                    validation_sample_size = val_len
+                val_len = validation_sample_size
+
         # Create validation generator
         globals()["validation_generator"] = DataGenerator(
             x_set=train_data[train_len:],
@@ -369,6 +377,22 @@ def set_test_train_data(
         globals()["test_len"] = test_len
 
     else:
+        # Set required dataset lengths
+        if training_sample_size is not None:
+            if training_sample_size > 0:
+                if training_sample_size < train_len:
+                    train_len = training_sample_size
+
+        if test_sample_size is not None:
+            if test_sample_size > 0:
+                if test_sample_size < test_len:
+                    test_len = test_sample_size
+
+        if validation_sample_size is not None:
+            if validation_sample_size > 0:
+                if validation_sample_size < validation_len:
+                    validation_len = validation_sample_size
+
         globals()["train_generator"] = train_generator
         globals()["train_len"] = train_len
         globals()["test_generator"] = test_generator
@@ -389,6 +413,7 @@ def load_tensorflow_params_from_config(config):
         GetTFQuantizationAware,
         GetTrainingSampleSize,
         GetTestSampleSize,
+        GetValidationSampleSize,
         GetValidationSplit,
         GetTFEarlyStopper,
         GetTFPatience,
@@ -415,6 +440,7 @@ def load_tensorflow_params_from_config(config):
     globals()["q_aware"] = GetTFQuantizationAware(config)
     globals()["training_sample_size"] = GetTrainingSampleSize(config)
     globals()["test_sample_size"] = GetTestSampleSize(config)
+    globals()["validation_sample_size"] = GetValidationSampleSize(config)
     globals()["validation_split"] = GetValidationSplit(config)
     globals()["early_stopper"] = GetTFEarlyStopper(config)
     if globals()["early_stopper"]:
