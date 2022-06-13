@@ -1,6 +1,6 @@
 import pathlib, os
 
-tmp_dir = "/tmp/TensorNAS"
+tmp_dir = os.path.dirname(os.path.realpath(__file__)) + "/tmp"
 zip_dir = tmp_dir + "/zips"
 
 

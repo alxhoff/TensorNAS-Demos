@@ -297,8 +297,8 @@ def set_test_train_data(
     train_len=None,
     test_generator=None,
     test_len=None,
-    val_generator=None,
-    val_len=None,
+    validation_generator=None,
+    validation_len=None,
     validation_split=None,
     batch_size=1,
     input_tensor_shape=None,
@@ -373,8 +373,8 @@ def set_test_train_data(
         globals()["train_len"] = train_len
         globals()["test_generator"] = test_generator
         globals()["test_len"] = test_len
-        globals()["validation_generator"] = val_generator
-        globals()["validation_len"] = val_len
+        globals()["validation_generator"] = validation_generator
+        globals()["validation_len"] = validation_len
 
     globals()["input_tensor_shape"] = input_tensor_shape
 

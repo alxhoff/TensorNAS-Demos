@@ -1,3 +1,5 @@
+import math
+
 dataset_name = "VisualWakeWords"
 dataset_train_zip = "train2014.zip"
 dataset_val_zip = "val2014.zip"
@@ -87,13 +89,15 @@ def GetData():
         print("VisualWakeWord annotations zip already exists, skipping downloads")
 
     if not os.path.isdir(os.path.join(output_dir, "annotations")):
-        import tqdm
+        from tqdm import tqdm
 
         print("Extracting VisualWakeWord's annotation's zip")
         with zipfile.ZipFile(
             zip_dir + "/{}".format(dataset_annotations_zip), "r"
         ) as zip_ref:
-            for member in tqdm(zip_ref.infolist(), desc="Extracting "):
+            for member in tqdm(
+                iterable=zip_ref.namelist(), total=len(zip_ref.namelist())
+            ):
                 try:
                     zip_ref.extract(member, output_dir)
                 except zipfile.error as e:
@@ -113,7 +117,7 @@ def GetData():
     )
     annotations_output_dir = os.path.join(output_dir, "annotations_out")
 
-    from Demos import (
+    from Demos.Datasets.VWW.create_coco_train_minival_split import (
         create_maxitrain_minival,
     )
 
@@ -129,7 +133,7 @@ def GetData():
             train_annotations_file, val_annotations_file, annotations_output_dir
         )
 
-    from Demos import (
+    from Demos.Datasets.VWW.create_visualwakewords_annotations import (
         create_visual_wakeword_annotations,
     )
 
@@ -146,6 +150,7 @@ def GetData():
     small_object_area_threshold = 0.005
     foreground_class_of_interest = "person"
 
+    print("Creating VVW train annotations")
     if not os.path.isfile(os.path.join(annotations_output_dir, "instances_train.json")):
         create_visual_wakeword_annotations(
             annotations_file=maxitrain_annotations_file,
@@ -163,6 +168,7 @@ def GetData():
     else:
         print("Train annotations already exist")
 
+    print("Creating VVW val annotations")
     if not os.path.isfile(os.path.join(annotations_output_dir, "instances_val.json")):
         create_visual_wakeword_annotations(
             annotations_file=minival_annotations_file,
@@ -210,6 +216,8 @@ def GetData():
 
         cur_dataset_len = len(eval("{}".format(cur_dataset)))
 
+        locals()["{}_len".format(cur_dataset)] = cur_dataset_len
+
         import sys
 
         cur_image_count = len(os.listdir(person_dir)) + len(os.listdir(nonperson_dir))
@@ -239,7 +247,11 @@ def GetData():
     validation_split = 0.1
 
     train_dir = os.path.join(output_dir, "train_dataset")
-    val_dir = os.path.join(output_dir, "test_dataset")
+    test_dir = os.path.join(output_dir, "test_dataset")
+
+    validation_dataset_len = math.floor(
+        locals()["train_dataset_len"] * validation_split
+    )
 
     datagen = tf.keras.preprocessing.image.ImageDataGenerator(
         rotation_range=10,
@@ -248,6 +260,15 @@ def GetData():
         zoom_range=0.1,
         horizontal_flip=True,
         validation_split=validation_split,
+        rescale=1.0 / 255,
+    )
+    test_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+        rotation_range=10,
+        width_shift_range=0.05,
+        height_shift_range=0.05,
+        zoom_range=0.1,
+        horizontal_flip=True,
+        validation_split=0,
         rescale=1.0 / 255,
     )
     train_generator = datagen.flow_from_directory(
@@ -264,11 +285,22 @@ def GetData():
         subset="validation",
         color_mode="rgb",
     )
+    test_generator = test_datagen.flow_from_directory(
+        test_dir,
+        target_size=(TARGET_SIZE, TARGET_SIZE),
+        batch_size=BATCH_SIZE,
+        subset="training",
+        color_mode="rgb",
+    )
     print(train_generator.class_indices)
 
     return {
         "train_generator": train_generator,
-        "val_generator": val_generator,
+        "train_len": locals()["train_dataset_len"],
+        "validation_generator": val_generator,
+        "validation_len": validation_dataset_len,
+        "test_generator": test_generator,
+        "test_len": locals()["test_dataset_len"],
         "input_tensor_shape": train_generator.image_shape,
     }
 
@@ -281,3 +313,8 @@ def resize_save_image(image, save_index, out_dir):
     hsize = int((float(image.size[1]) * float(wpercent)))
     image = image.resize((TARGET_SIZE, hsize), Image.ANTIALIAS)
     image.save("{}/{}.jpg".format(out_dir, save_index))
+
+
+def GetInputShape():
+
+    return (96, 96, 3)

@@ -45,22 +45,19 @@ if __name__ == "__main__":
     load_tensorflow_params_from_config(config)
 
     dataset_module = get_global("dataset_module")
-    set_global("input_tensor_shape", dataset_module.GetInputShape())
 
     ## Multithreaded programs will want to get dataset data external to the parallelized evaluation step.
     ## Distributed progrems will want to get dataset data during the distributed evaliations steps such that they have
     ## local copies of the dataset.
     if get_global("multithreaded") or not get_global("local_dataset"):
-
-        data = dataset_module.GetData()
-
         set_test_train_data(
-            **data,
+            **dataset_module.GetData(),
             training_sample_size=get_global("training_sample_size"),
             test_sample_size=get_global("test_sample_size"),
             batch_size=get_global("batch_size"),
         )
 
+    set_global("input_tensor_shape", dataset_module.GetInputShape())
     gba = get_global("gen_block_architecture")
 
     pop, logbook, test = run_deap_test(

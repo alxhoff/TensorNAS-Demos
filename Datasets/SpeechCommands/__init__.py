@@ -19,6 +19,7 @@ def GetData():
     ds_test = ds_test.repeat()
 
     train_len = 85511
+    validation_len = 10102
     test_len = 4890
 
     import tensorflow as tf
@@ -26,8 +27,10 @@ def GetData():
     shape = tuple(tf.compat.v1.data.get_output_shapes(ds_train)[0].as_list()[1:])
 
     return {
-        "train_generator_x": ds_train,
+        "train_generator": ds_train,
         "train_len": train_len,
+        "validation_generator": ds_val,
+        "validation_len": validation_len,
         "test_generator": ds_test,
         "test_len": test_len,
         "input_tensor_shape": shape,

@@ -35,8 +35,11 @@ def create_maxitrain_minival(train_file, val_file, output_dir):
     val_json = json.load(open(val_file, "r"))
 
     info = train_json["info"]
+    print("Info set")
     categories = train_json["categories"]
+    print("Categories set")
     licenses = train_json["licenses"]
+    print("Licenses set")
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(dir_path, "mscoco_minival_ids.txt")
@@ -45,16 +48,22 @@ def create_maxitrain_minival(train_file, val_file, output_dir):
     minival_ids = [int(i) for i in minival_ids]
 
     train_images = train_json["images"]
+    print("Train images set")
     val_images = val_json["images"]
+    print("Val images set")
     train_annotations = train_json["annotations"]
+    print("Train annotations set")
     val_annotations = val_json["annotations"]
+    print("Val annotations set")
 
     maxitrain_images = []
     minival_images = []
     maxitrain_annotations = []
     minival_annotations = []
 
-    for _images in [train_images, val_images]:
+    im_len = len(train_images) + len(val_images)
+    for i, _images in enumerate([train_images, val_images]):
+        print("Processing image {}/2".format(i))
         for img in _images:
             img_id = img["id"]
             if img_id in minival_ids:
@@ -62,7 +71,9 @@ def create_maxitrain_minival(train_file, val_file, output_dir):
             else:
                 maxitrain_images.append(img)
 
-    for _annotations in [train_annotations, val_annotations]:
+    an_len = len(train_annotations) + len(val_annotations)
+    for i, _annotations in enumerate([train_annotations, val_annotations]):
+        print("Processing annotation {}/2".format(i))
         for ann in _annotations:
             img_id = ann["image_id"]
             if img_id in minival_ids:
@@ -70,6 +81,7 @@ def create_maxitrain_minival(train_file, val_file, output_dir):
             else:
                 maxitrain_annotations.append(ann)
 
+    print("Dumping max to json")
     with open(maxitrain_path, "w") as fp:
         json.dump(
             {
@@ -82,6 +94,7 @@ def create_maxitrain_minival(train_file, val_file, output_dir):
             fp,
         )
 
+    print("Dumping min to json")
     with open(minival_path, "w") as fp:
         json.dump(
             {
