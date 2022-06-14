@@ -142,9 +142,12 @@ def mutate_individual(individual):
                 mutation_note,
                 mutation_table_references,
             ) = attempt.mutate(
-                verbose=verbose,
-                mutate_equally=get_global("mutation_method"),
+                mutation_method=get_global("mutation_method"),
                 mutation_probability=get_global("self_mutation_probability"),
+                mutate_with_reinforcement_learning=get_global(
+                    "use_reinforcement_learning"
+                ),
+                verbose=verbose,
             )
 
             model = attempt.get_keras_model(loss=loss, metrics=metrics)

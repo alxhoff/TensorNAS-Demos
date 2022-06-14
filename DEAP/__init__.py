@@ -26,6 +26,7 @@ def load_genetic_params_from_config(config):
         GetTestSampleSize,
         GetGenerationGap,
         GetGenerationSaveInterval,
+        GetUseReinforcementLearning,
         GetAlpha,
     )
 
@@ -47,6 +48,7 @@ def load_genetic_params_from_config(config):
     set_global("test_sample_size", GetTestSampleSize(config))
     set_global("generation_gap", GetGenerationGap(config))
     set_global("generation_save_interval", GetGenerationSaveInterval(config))
+    set_global("use_reinforcement_learning", GetUseReinforcementLearning(config))
     set_global("alpha", GetAlpha(config))
 
 

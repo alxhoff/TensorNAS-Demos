@@ -56,6 +56,7 @@ if __name__ == "__main__":
             test_sample_size=get_global("test_sample_size"),
             validation_sample_size=get_global("validation_sample_size"),
             batch_size=get_global("batch_size"),
+            validation_split=get_global("validation_split")
         )
 
     set_global("input_tensor_shape", dataset_module.GetInputShape())
