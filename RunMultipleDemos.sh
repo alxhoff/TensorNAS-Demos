@@ -3,6 +3,7 @@
 directory="."
 script="DemoEASimple.py"
 execution="."
+py="python"
 
 Help()
 {
@@ -13,15 +14,17 @@ Help()
    echo "e     Execution directory"
    echo "s     Script path relative to execution directory"
    echo "d     Config file directory relative to execution directory"
+   echo "-p    Python version to use"
    echo
 }
 
-while getopts d:s:e: flag
+while getopts d:s:e:p:h: flag
 do
     case "${flag}" in
         e) execution=${OPTARG};;
         s) script=${OPTARG};;
         d) directory=${OPTARG};;
+        p) py=${OPTARG};;
         h) Help
           exit;;
     esac
@@ -39,6 +42,7 @@ cd $execution
 echo "Moved to $(pwd) for execution"
 
 for f in $directory/*.cfg; do
-  echo "python -m $script --config $execution/$f"
-  python -m $script --config $execution/$f
+  command="$py -m $script --config $execution/$f"
+  echo $command
+  exec $command
 done
