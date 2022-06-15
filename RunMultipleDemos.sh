@@ -39,9 +39,10 @@ script=${script::-3}
 echo $script
 
 cd $execution
-echo "Moved to $(pwd) for execution"
+echo "Moved to $execution for execution"
 
-for f in $directory/*.cfg; do
+for f in "$directory"/*.cfg; do
+  echo "$f"
   command="$py -m $script --config $execution/$f"
   echo $command
   exec $command
