@@ -132,7 +132,7 @@ def read_in_dataset(data_dir):
 
     param = yaml_load()
 
-    files = file_list_generator(data_dir)
+    files = file_list_generator(data_dir)[:2000]
     train_data = list_to_vector_array(
         files,
         msg="generate train_dataset",
@@ -199,7 +199,7 @@ def _GetTestData():
     test_files = []
     y_true = []
 
-    for id in machine_ids[0]:
+    for id in machine_ids:
         tf, yt = test_file_list_generator(dataset_dir, id, True)
         test_files.append(tf)
         y_true.append(yt)
