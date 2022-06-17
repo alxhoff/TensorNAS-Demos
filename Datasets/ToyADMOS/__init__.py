@@ -132,7 +132,7 @@ def read_in_dataset(data_dir):
 
     param = yaml_load()
 
-    files = file_list_generator(data_dir)[:2000]
+    files = file_list_generator(data_dir)
     train_data = list_to_vector_array(
         files,
         msg="generate train_dataset",

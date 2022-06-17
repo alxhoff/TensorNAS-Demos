@@ -1,3 +1,6 @@
+ffprobe
+ffmpeg
+avconv
 tensorflow
 tensorflow_datasets
 deap

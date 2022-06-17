@@ -254,6 +254,7 @@ def load_globals_from_config(config):
         import os
         import tensorflow as tf
 
+        print("Suppressing verbosity")
         tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
         os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # FATAL
 
@@ -371,7 +372,7 @@ def set_test_train_data(
         train_labels = train_labels[:train_len]
 
         globals()["train_generator"] = DataGenerator(
-            x_set=train_data, y_set=train_labels, batch_size=batch_size
+            x_set=train_data[:train_len], y_set=train_labels[:train_len], batch_size=batch_size
         )
         globals()["test_generator"] = DataGenerator(
             x_set=test_data, y_set=test_labels, batch_size=1
