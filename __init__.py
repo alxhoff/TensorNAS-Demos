@@ -275,8 +275,6 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.x, self.y = x_set, y_set
         self.batch_size = batch_size
 
-        self.n = len(x_set)
-
     def __len__(self):
         return len(self.x) // self.batch_size
 
@@ -377,7 +375,9 @@ def set_test_train_data(
         train_labels = train_labels[:train_len]
 
         globals()["train_generator"] = DataGenerator(
-            x_set=train_data[:train_len], y_set=train_labels[:train_len], batch_size=batch_size
+            x_set=train_data[:train_len],
+            y_set=train_labels[:train_len],
+            batch_size=batch_size,
         )
         globals()["test_generator"] = DataGenerator(
             x_set=test_data, y_set=test_labels, batch_size=1
