@@ -1,4 +1,4 @@
-from TensorNAS.Blocks.BlockArchitectures.InceptionNetArchitecture import (
+from TensorNAS.Blocks.BlockArchitectures.InceptionNetBlockArchitecture import (
     Block as InceptionNetBlockArchitecture,
 )
 from TensorNAS.Tools import list_available_blocks

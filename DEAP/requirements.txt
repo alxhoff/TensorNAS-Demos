@@ -14,3 +14,5 @@ librosa
 pyyaml
 tqdm
 googleapis-common-protos
+pycocotools
+pyvww
