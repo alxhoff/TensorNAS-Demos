@@ -41,8 +41,11 @@ echo $script
 cd $execution
 echo "Moved to $execution for execution"
 
-for f in "$execution/$directory"/*.cfg; do
-  echo "$f"
+echo "Script dir"
+echo $directory
+
+for f in $directory/*.cfg
+do
   command="$py -m $script --config $f"
   echo $command
   exec $command
