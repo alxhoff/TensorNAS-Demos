@@ -53,19 +53,19 @@ def get_config(args=None):
 def gen_classification_ba():
     global ba_mod, input_tensor_shape, class_count, batch_size, optimizer
 
-    try:
-        ba = ba_mod.Block(
-            input_shape=input_tensor_shape,
-            batch_size=batch_size,
-            optimizer=optimizer,
-            class_count=class_count,
-        )
-        return ba
-    except Exception as e:
-        import traceback
+    ba = None
+    while ba is None:
+        try:
+            ba = ba_mod.Block(
+                input_shape=input_tensor_shape,
+                batch_size=batch_size,
+                optimizer=optimizer,
+                class_count=class_count,
+            )
+        except:
+            pass
 
-        print(traceback.format_exc())
-        raise e
+    return ba
 
 
 def gen_auc_ba():
