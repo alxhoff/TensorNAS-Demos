@@ -48,5 +48,5 @@ for f in $directory/*.cfg
 do
   command="$py -m $script --config $f"
   echo $command
-  exec $command
+  eval " $command" || true
 done
