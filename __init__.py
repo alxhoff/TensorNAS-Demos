@@ -51,7 +51,7 @@ def get_config(args=None):
 
 
 def gen_classification_ba():
-    global ba_mod, input_tensor_shape, class_count, batch_size, optimizer
+    global ba_mod, input_tensor_shape, class_count, batch_size, test_batch_size, optimizer
 
     ba = None
     while ba is None:
@@ -59,6 +59,7 @@ def gen_classification_ba():
             ba = ba_mod.Block(
                 input_shape=input_tensor_shape,
                 batch_size=batch_size,
+                test_batch_size=test_batch_size,
                 optimizer=optimizer,
                 class_count=class_count,
             )
@@ -83,8 +84,8 @@ def gen_auc_ba():
 
 
 def evaluate_individual(individual, test_name, gen, logger):
-    global epochs, batch_size, loss, metrics, train_generator, validation_generator
-    global test_generator, save_individuals, q_aware, steps_per_epoch, batch_size, test_len
+    global epochs, batch_size, loss, metrics, train_generator, validation_generator, use_clear_memory
+    global test_generator, save_individuals, q_aware, steps_per_epoch, batch_size, test_batch_size, test_len
     global dataset_module, verbose, train_len, test_len, validation_split, validation_len
 
     if not get_global("multithreaded"):
@@ -111,11 +112,13 @@ def evaluate_individual(individual, test_name, gen, logger):
         validation_len=validation_len,
         epochs=epochs,
         batch_size=batch_size,
+        test_batch_size=test_batch_size,
         loss=loss,
         metrics=metrics,
         test_name=test_name,
         model_name="{}/{}".format(gen, individual.index),
         q_aware=q_aware,
+        use_clear_memory=use_clear_memory,
         logger=logger,
         verbose=verbose,
     )
@@ -416,10 +419,12 @@ def load_tensorflow_params_from_config(config):
     from TensorNAS.Tools.ConfigParse import (
         GetTFEpochs,
         GetTFBatchSize,
+        GetTFTestBatchSize,
         GetTFOptimizer,
         GetTFLoss,
         GetTFMetrics,
         GetTFQuantizationAware,
+        GetTFUseClearMemory,
         GetTrainingSampleSize,
         GetTestSampleSize,
         GetValidationSampleSize,
@@ -443,10 +448,12 @@ def load_tensorflow_params_from_config(config):
 
     globals()["epochs"] = GetTFEpochs(config)
     globals()["batch_size"] = GetTFBatchSize(config)
+    globals()["test_batch_size"] = GetTFTestBatchSize(config)
     globals()["optimizer"] = GetTFOptimizer(config)
     globals()["loss"] = GetTFLoss(config)
     globals()["metrics"] = GetTFMetrics(config)
     globals()["q_aware"] = GetTFQuantizationAware(config)
+    globals()["use_clear_memory"] = GetTFUseClearMemory(config)
     globals()["training_sample_size"] = GetTrainingSampleSize(config)
     globals()["test_sample_size"] = GetTestSampleSize(config)
     globals()["validation_sample_size"] = GetValidationSampleSize(config)
