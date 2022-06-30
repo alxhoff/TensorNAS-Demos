@@ -15,12 +15,21 @@ def GetData():
 
     ds_train, ds_test, ds_val = get_training_data(Flags)
 
-    ds_train = ds_train.repeat()
-    ds_test = ds_test.repeat()
-
     train_len = 85511
     validation_len = 10102
     test_len = 4890
+
+    # ds_train = ds_train.shuffle(train_len)
+    # ds_test = ds_test.shuffle(test_len)
+    # ds_val = ds_val.shuffle(validation_len)
+
+    train_len = len(ds_train)
+    validation_len = len(ds_val)
+    test_len = len(ds_test)
+
+    ds_train = ds_train.repeat()
+    ds_test = ds_test.repeat()
+    ds_val = ds_val.repeat()
 
     import tensorflow as tf
 
