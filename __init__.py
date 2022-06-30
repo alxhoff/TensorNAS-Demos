@@ -63,7 +63,10 @@ def gen_classification_ba():
                 optimizer=optimizer,
                 class_count=class_count,
             )
-        except:
+        except Exception as e:
+            import traceback
+
+            print(traceback.format_exc())
             pass
 
     return ba
