@@ -274,21 +274,21 @@ def GetData():
     train_generator = datagen.flow_from_directory(
         train_dir,
         target_size=(TARGET_SIZE, TARGET_SIZE),
-        batch_size=BATCH_SIZE,
+        batch_size=32,
         subset="training",
         color_mode="rgb",
     )
     val_generator = datagen.flow_from_directory(
         train_dir,
         target_size=(TARGET_SIZE, TARGET_SIZE),
-        batch_size=BATCH_SIZE,
+        batch_size=32,
         subset="validation",
         color_mode="rgb",
     )
     test_generator = test_datagen.flow_from_directory(
         test_dir,
         target_size=(TARGET_SIZE, TARGET_SIZE),
-        batch_size=BATCH_SIZE,
+        batch_size=32,
         subset="training",
         color_mode="rgb",
     )
@@ -296,11 +296,11 @@ def GetData():
 
     return {
         "train_generator": train_generator,
-        "train_len": locals()["train_dataset_len"],
+        "train_len": len(train_generator),
         "validation_generator": val_generator,
-        "validation_len": validation_dataset_len,
+        "validation_len": len(val_generator),
         "test_generator": test_generator,
-        "test_len": locals()["test_dataset_len"],
+        "test_len": len(test_generator),
         "input_tensor_shape": train_generator.image_shape,
     }
 
