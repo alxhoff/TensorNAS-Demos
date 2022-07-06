@@ -136,6 +136,7 @@ def mutate_individual(individual):
     mutation_attempts = get_global("mutation_attempts")
     loss = get_global("loss")
     metrics = get_global("metrics")
+
     attempts = 0
     mutated = False
     mutation_operation, mutation_note, mutation_table_references = None, None, None
@@ -153,6 +154,7 @@ def mutate_individual(individual):
                 mutate_with_reinforcement_learning=get_global(
                     "use_reinforcement_learning"
                 ),
+                goal_attainment=get_global("use_goal_attainment"),
                 verbose=verbose,
             )
 
@@ -202,6 +204,7 @@ def load_globals_from_config(config):
         GetSaveIndividual,
         GetFilterFunction,
         GetFilterFunctionArgs,
+        GetUseGoalAttainment,
         GetWeights,
         GetFigureTitle,
     )
@@ -234,6 +237,7 @@ def load_globals_from_config(config):
     globals()["save_individuals"] = GetSaveIndividual(config)
     globals()["filter_function"] = GetFilterFunction(config)
     globals()["filter_function_args"] = GetFilterFunctionArgs(config)
+    globals()["use_goal_attainment"] = GetUseGoalAttainment(config)
     globals()["weights"] = GetWeights(config)
     globals()["comments"] = GetFigureTitle(config)
 
