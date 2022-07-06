@@ -35,6 +35,7 @@ def GetData():
     from Demos import get_global
 
     batch_size = get_global("batch_size")
+    INTERNAL_BATCH_SIZE = 512
 
     from Demos.Datasets import (
         make_dataset_dirs,
@@ -274,21 +275,21 @@ def GetData():
     train_generator = datagen.flow_from_directory(
         train_dir,
         target_size=(TARGET_SIZE, TARGET_SIZE),
-        batch_size=32,
+        batch_size=INTERNAL_BATCH_SIZE,
         subset="training",
         color_mode="rgb",
     )
     val_generator = datagen.flow_from_directory(
         train_dir,
         target_size=(TARGET_SIZE, TARGET_SIZE),
-        batch_size=32,
+        batch_size=INTERNAL_BATCH_SIZE,
         subset="validation",
         color_mode="rgb",
     )
     test_generator = test_datagen.flow_from_directory(
         test_dir,
         target_size=(TARGET_SIZE, TARGET_SIZE),
-        batch_size=32,
+        batch_size=INTERNAL_BATCH_SIZE,
         subset="training",
         color_mode="rgb",
     )
