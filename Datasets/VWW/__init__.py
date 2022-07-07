@@ -35,7 +35,6 @@ def GetData(dataset_dir):
     from Demos import get_global
 
     batch_size = get_global("batch_size")
-    INTERNAL_BATCH_SIZE = 128
 
     from Demos.Datasets import (
         make_dataset_dirs,
@@ -221,7 +220,7 @@ def GetData(dataset_dir):
 
         cur_dataset_len = len(eval("{}".format(cur_dataset)))
 
-        locals()["{}_len".format(cur_dataset)] = cur_dataset_len
+        locals()["{}_len".format(cur_dataset)] = cur_dataset_len // batch_size
 
         import sys
 
@@ -248,7 +247,6 @@ def GetData(dataset_dir):
     # create keras dataset from directory
     import tensorflow as tf
 
-    BATCH_SIZE = batch_size
     validation_split = 0.1
 
     train_dir = os.path.join(output_dir, "train_dataset")
@@ -279,14 +277,14 @@ def GetData(dataset_dir):
     train_generator = datagen.flow_from_directory(
         train_dir,
         target_size=(TARGET_SIZE, TARGET_SIZE),
-        batch_size=INTERNAL_BATCH_SIZE,
+        batch_size=batch_size,
         subset="training",
         color_mode="rgb",
     )
     val_generator = datagen.flow_from_directory(
         train_dir,
         target_size=(TARGET_SIZE, TARGET_SIZE),
-        batch_size=INTERNAL_BATCH_SIZE,
+        batch_size=batch_size,
         subset="validation",
         color_mode="rgb",
     )
@@ -301,11 +299,11 @@ def GetData(dataset_dir):
 
     return {
         "train_generator": train_generator,
-        "train_len": len(train_generator),
+        "train_len": locals()["train_dataset_len"],
         "validation_generator": val_generator,
-        "validation_len": len(val_generator),
+        "validation_len": validation_dataset_len,
         "test_generator": test_generator,
-        "test_len": len(test_generator),
+        "test_len": locals()["test_dataset_len"],
         "input_tensor_shape": train_generator.image_shape,
     }
 
