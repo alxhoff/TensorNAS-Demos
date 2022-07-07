@@ -99,7 +99,7 @@ def evaluate_individual(individual, test_name, gen, logger):
             from Demos import set_test_train_data
 
             set_test_train_data(
-                **dataset_module.GetData(),
+                **dataset_module.GetData(get_global("dataset_directory")),
                 validation_split=validation_split,
                 training_sample_size=get_global("training_sample_size"),
                 test_sample_size=get_global("test_sample_size"),
