@@ -1,17 +1,20 @@
-from Demos.Datasets import tmp_dir
 import os
 
 data_folder = "SpeechCommands"
 
+
 def GetData(dataset_dir):
+    from Demos.Datasets import tmp_dir
+
+    tdir = tmp_dir
 
     from Demos.Datasets.SpeechCommands.kws_util import parse_command
     from Demos.Datasets.SpeechCommands.get_dataset import get_training_data
 
     if dataset_dir != "":
-        tmp_dir = dataset_dir
+        tdir = dataset_dir
 
-    data_dir = os.path.join(tmp_dir, data_folder)
+    data_dir = os.path.join(tdir, data_folder)
 
     Flags, unparsed = parse_command()
     Flags.data_dir = data_dir
