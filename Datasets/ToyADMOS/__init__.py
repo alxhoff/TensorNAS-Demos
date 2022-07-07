@@ -146,7 +146,7 @@ def read_in_dataset(data_dir):
     return train_data
 
 
-def GetData():
+def GetData(dataset_dir):
     from Demos.Datasets import make_dataset_dirs
 
     dataset_name = "ToyCar"

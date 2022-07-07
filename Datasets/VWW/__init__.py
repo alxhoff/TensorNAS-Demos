@@ -30,12 +30,12 @@ class DatasetLabelWrapper:
         return self.dataset[item][1]
 
 
-def GetData():
+def GetData(dataset_dir):
     global TARGET_SIZE
     from Demos import get_global
 
     batch_size = get_global("batch_size")
-    INTERNAL_BATCH_SIZE = 512
+    INTERNAL_BATCH_SIZE = 128
 
     from Demos.Datasets import (
         make_dataset_dirs,
@@ -44,6 +44,10 @@ def GetData():
         bar_progress,
     )
     import wget, os, zipfile, shutil
+
+    if dataset_dir != "":
+        tmp_dir = dataset_dir
+        zip_dir = dataset_dir + "/zips"
 
     make_dataset_dirs(dataset_name)
 
@@ -289,7 +293,7 @@ def GetData():
     test_generator = test_datagen.flow_from_directory(
         test_dir,
         target_size=(TARGET_SIZE, TARGET_SIZE),
-        batch_size=INTERNAL_BATCH_SIZE,
+        batch_size=1,
         subset="training",
         color_mode="rgb",
     )

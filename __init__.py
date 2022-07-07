@@ -197,6 +197,8 @@ def load_globals_from_config(config):
         GetMultithreaded,
         GetDistributed,
         GetDatasetModule,
+        GetUseDatasetDirectory,
+        GetDatasetDirectory,
         GetLocalDataset,
         GetGenBlockArchitecture,
         GetThreadCount,
@@ -218,6 +220,9 @@ def load_globals_from_config(config):
     globals()["multithreaded"] = GetMultithreaded(config)
     globals()["distributed"] = GetDistributed(config)
     dm = GetDatasetModule(config)
+    globals()["dataset_directory"] = ""
+    if GetUseDatasetDirectory(config):
+        globals()["dataset_directory"] = GetDatasetDirectory(config)
     components = dm.split(".")
     dm = __import__(dm)
     for comp in components[1:]:

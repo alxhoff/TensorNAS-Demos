@@ -51,7 +51,7 @@ if __name__ == "__main__":
     ## local copies of the dataset.
     if get_global("multithreaded") or not get_global("local_dataset"):
         set_test_train_data(
-            **dataset_module.GetData(),
+            **dataset_module.GetData(get_global("dataset_directory")),
             training_sample_size=get_global("training_sample_size"),
             test_sample_size=get_global("test_sample_size"),
             validation_sample_size=get_global("validation_sample_size"),

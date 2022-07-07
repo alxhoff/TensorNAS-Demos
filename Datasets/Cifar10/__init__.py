@@ -3,7 +3,7 @@ dataset_zip = "cifar-10-python.tar.gz"
 dataset_url = "https://www.cs.toronto.edu/~kriz/{}".format(dataset_zip)
 
 
-def GetData():
+def GetData(dataset_dir):
 
     from Demos.Datasets import (
         make_dataset_dirs,
@@ -12,6 +12,10 @@ def GetData():
         bar_progress,
     )
     import wget, os
+
+    if dataset_dir != "":
+        tmp_dir = dataset_dir
+        zip_dir = dataset_dir + "/zips"
 
     make_dataset_dirs(dataset_name)
 
