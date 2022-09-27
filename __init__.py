@@ -106,7 +106,7 @@ def evaluate_individual(individual, test_name, gen, logger):
                 batch_size=batch_size,
             )
 
-    param_count, accuracy = individual.evaluate(
+    param_count, accuracy, flops, storage = individual.evaluate(
         train_generator=train_generator,
         train_len=train_len,
         test_generator=test_generator,
@@ -126,7 +126,7 @@ def evaluate_individual(individual, test_name, gen, logger):
         verbose=verbose,
     )
 
-    return param_count, accuracy
+    return param_count, accuracy, flops, storage
 
 
 def mutate_individual(individual):
