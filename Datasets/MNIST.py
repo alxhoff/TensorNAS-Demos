@@ -1,4 +1,4 @@
-def GetData():
+def GetData(dataset_dir):
     import tensorflow as tf
 
     (
