@@ -43,8 +43,10 @@ def get_config(args=None):
         test_name_prefix = GetOutputPrefix(config)
         set_global("test_name", strftime("%d_%m_%Y-%H_%M", gmtime()))
         if test_name_prefix:
-            set_global("test_name", test_name_prefix + "_" + get_global("test_name"))
-        set_global("test_name", get_global("test_name") + "_" + get_global("ba_name"))
+            set_global("test_name", test_name_prefix +
+                       "_" + get_global("test_name"))
+        set_global("test_name", get_global(
+            "test_name") + "_" + get_global("ba_name"))
         CopyConfig(config_loc, get_global("test_name"))
 
     return config
@@ -241,14 +243,15 @@ def load_globals_from_config(config):
     globals()["use_gpu"] = GetGPU(config)
     globals()["save_individuals"] = GetSaveIndividual(config)
     globals()["filter_function"] = GetFilterFunction(config)
-    globals()["filter_function_args"] = GetFilterFunctionArgs(config)
+    #globals()["filter_function_args"] = GetFilterFunctionArgs(config)
+    globals()["filter_function_args"] = ([(3000.0, 90.0, 0.5)], [(500, 1, 0.001)])
     globals()["use_goal_attainment"] = GetUseGoalAttainment(config)
     globals()["weights"] = GetWeights(config)
-    globals()["goals_number"] = 2
-    globals()["mutation_log_string"] = "param diff: {} acc diff: {}"
-    globals()["evaluated_values_log_string"] = "params:{}, acc:{}%"
-    globals()["pareto_log_string"] = "Acc: {}, Param Count: {}"
-    globals()["raw_evaluated_values_row"] = [["Param Count"], ["Accuracy"]]
+    globals()["goals_number"] = 3
+    globals()["mutation_log_string"] = "param diff: {} acc diff: {} crossent diff: {}"
+    globals()["evaluated_values_log_string"] = "params:{}, acc:{}%, crossent:{}"
+    globals()["pareto_log_string"] = "Crossent: {}, Acc: {}, Param Count: {}"
+    globals()["raw_evaluated_values_row"] = [["Param Count"], ["Accuracy"], ["Crossentropy"]]
     globals()["comments"] = GetFigureTitle(config)
 
     if globals()["use_gpu"]:
@@ -300,8 +303,8 @@ class DataGenerator(tf.keras.utils.Sequence):
 
     def __getitem__(self, item):
 
-        batch_x = self.x[item * self.batch_size : (item + 1) * self.batch_size]
-        batch_y = self.y[item * self.batch_size : (item + 1) * self.batch_size]
+        batch_x = self.x[item * self.batch_size: (item + 1) * self.batch_size]
+        batch_y = self.y[item * self.batch_size: (item + 1) * self.batch_size]
 
         return batch_x, batch_y
 
@@ -468,7 +471,8 @@ def load_tensorflow_params_from_config(config):
     globals()["test_batch_size"] = GetTFTestBatchSize(config)
     globals()["optimizer"] = GetTFOptimizer(config)
     globals()["loss"] = GetTFLoss(config)
-    globals()["metrics"] = GetTFMetrics(config)
+    #globals()["metrics"] = GetTFMetrics(config)
+    globals()["metrics"] = ['accuracy', 'crossentropy']
     globals()["q_aware"] = GetTFQuantizationAware(config)
     globals()["use_clear_memory"] = GetTFUseClearMemory(config)
     globals()["training_sample_size"] = GetTrainingSampleSize(config)
