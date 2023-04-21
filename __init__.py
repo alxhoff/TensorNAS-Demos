@@ -244,6 +244,11 @@ def load_globals_from_config(config):
     globals()["filter_function_args"] = GetFilterFunctionArgs(config)
     globals()["use_goal_attainment"] = GetUseGoalAttainment(config)
     globals()["weights"] = GetWeights(config)
+    globals()["goals_number"] = 2
+    globals()["mutation_log_string"] = "param diff: {} acc diff: {}"
+    globals()["evaluated_values_log_string"] = "params:{}, acc:{}%"
+    globals()["pareto_log_string"] = "Acc: {}, Param Count: {}"
+    globals()["raw_evaluated_values_row"] = [["Param Count"], ["Accuracy"]]
     globals()["comments"] = GetFigureTitle(config)
 
     if globals()["use_gpu"]:
