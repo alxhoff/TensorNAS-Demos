@@ -211,6 +211,8 @@ def load_globals_from_config(config):
         GetUseGoalAttainment,
         GetWeights,
         GetFigureTitle,
+        GetGoalsNumber,
+        _GetLogString,
     )
     from TensorNAS.Tools.JSONImportExport import GetBlockMod
 
@@ -243,15 +245,11 @@ def load_globals_from_config(config):
     globals()["use_gpu"] = GetGPU(config)
     globals()["save_individuals"] = GetSaveIndividual(config)
     globals()["filter_function"] = GetFilterFunction(config)
-    #globals()["filter_function_args"] = GetFilterFunctionArgs(config)
-    globals()["filter_function_args"] = ([(3000.0, 90.0, 0.5)], [(500, 1, 0.001)])
+    globals()["filter_function_args"] = GetFilterFunctionArgs(config)
     globals()["use_goal_attainment"] = GetUseGoalAttainment(config)
     globals()["weights"] = GetWeights(config)
-    globals()["goals_number"] = 3
-    globals()["mutation_log_string"] = "param diff: {} acc diff: {} crossent diff: {}"
-    globals()["evaluated_values_log_string"] = "params:{}, acc:{}%, crossent:{}"
-    globals()["pareto_log_string"] = "Crossent: {}, Acc: {}, Param Count: {}"
-    globals()["raw_evaluated_values_row"] = [["Param Count"], ["Accuracy"], ["Crossentropy"]]
+    globals()["goals_number"] = GetGoalsNumber(config)
+    globals()["mutation_log_string"], globals()["evaluated_values_log_string"], globals()["pareto_log_string"], globals()["raw_evaluated_values_row"] = _GetLogString(config)
     globals()["comments"] = GetFigureTitle(config)
 
     if globals()["use_gpu"]:
@@ -471,8 +469,7 @@ def load_tensorflow_params_from_config(config):
     globals()["test_batch_size"] = GetTFTestBatchSize(config)
     globals()["optimizer"] = GetTFOptimizer(config)
     globals()["loss"] = GetTFLoss(config)
-    #globals()["metrics"] = GetTFMetrics(config)
-    globals()["metrics"] = ['accuracy', 'crossentropy']
+    globals()["metrics"] = GetTFMetrics(config)
     globals()["q_aware"] = GetTFQuantizationAware(config)
     globals()["use_clear_memory"] = GetTFUseClearMemory(config)
     globals()["training_sample_size"] = GetTrainingSampleSize(config)
