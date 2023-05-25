@@ -153,9 +153,7 @@ def mutate_individual(individual):
             ) = attempt.mutate(
                 mutation_method=get_global("mutation_method"),
                 mutation_probability=get_global("self_mutation_probability"),
-                mutate_with_reinforcement_learning=get_global(
-                    "use_reinforcement_learning"
-                ),
+                mutate_with_reinforcement_learning=get_global("use_reinforcement_learning"),
                 goal_attainment=get_global("use_goal_attainment"),
                 verbose=verbose,
             )

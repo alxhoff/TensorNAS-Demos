@@ -64,7 +64,6 @@ def run_deap_test(generate_individual, evaluate_individual, crossover, mutate):
     setup_DEAP(
         creator=creator,
         toolbox=toolbox,
-        objective_weights=[-1], # to minimize the indiv. fitness value calculated by the  minmax filter function
         multithreaded=get_global("multithreaded"),
         distributed=get_global("distributed"),
         thread_count=get_global("thread_count"),
