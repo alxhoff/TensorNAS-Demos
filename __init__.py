@@ -211,6 +211,7 @@ def load_globals_from_config(config):
         GetFigureTitle,
         GetGoalsNumber,
         _GetLogString,
+        _GetOptimizationGoals,
     )
     from TensorNAS.Tools.JSONImportExport import GetBlockMod
 
@@ -248,6 +249,7 @@ def load_globals_from_config(config):
     globals()["weights"] = GetWeights(config)
     globals()["goals_number"] = GetGoalsNumber(config)
     globals()["mutation_log_string"], globals()["evaluated_values_log_string"], globals()["pareto_log_string"], globals()["raw_evaluated_values_row"] = _GetLogString(config)
+    globals()["OptimizationGoal"] = _GetOptimizationGoals(config)
     globals()["comments"] = GetFigureTitle(config)
 
     if globals()["use_gpu"]:
