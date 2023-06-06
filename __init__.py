@@ -43,10 +43,8 @@ def get_config(args=None):
         test_name_prefix = GetOutputPrefix(config)
         set_global("test_name", strftime("%d_%m_%Y-%H_%M", gmtime()))
         if test_name_prefix:
-            set_global("test_name", test_name_prefix +
-                       "_" + get_global("test_name"))
-        set_global("test_name", get_global(
-            "test_name") + "_" + get_global("ba_name"))
+            set_global("test_name", test_name_prefix + "_" + get_global("test_name"))
+        set_global("test_name", get_global("test_name") + "_" + get_global("ba_name"))
         CopyConfig(config_loc, get_global("test_name"))
 
     return config
@@ -153,7 +151,9 @@ def mutate_individual(individual):
             ) = attempt.mutate(
                 mutation_method=get_global("mutation_method"),
                 mutation_probability=get_global("self_mutation_probability"),
-                mutate_with_reinforcement_learning=get_global("use_reinforcement_learning"),
+                mutate_with_reinforcement_learning=get_global(
+                    "use_reinforcement_learning"
+                ),
                 goal_attainment=get_global("use_goal_attainment"),
                 verbose=verbose,
             )
@@ -212,6 +212,7 @@ def load_globals_from_config(config):
         GetGoalsNumber,
         _GetLogString,
         _GetOptimizationGoals,
+        GetMlonmcuArgs,
     )
     from TensorNAS.Tools.JSONImportExport import GetBlockMod
 
@@ -245,10 +246,16 @@ def load_globals_from_config(config):
     globals()["save_individuals"] = GetSaveIndividual(config)
     globals()["filter_function"] = GetFilterFunction(config)
     globals()["filter_function_args"] = GetFilterFunctionArgs(config)
+    globals()["mlonmcu_args"] = GetMlonmcuArgs(config)
     globals()["use_goal_attainment"] = GetUseGoalAttainment(config)
     globals()["weights"] = GetWeights(config)
     globals()["goals_number"] = GetGoalsNumber(config)
-    globals()["mutation_log_string"], globals()["evaluated_values_log_string"], globals()["pareto_log_string"], globals()["raw_evaluated_values_row"] = _GetLogString(config)
+    (
+        globals()["mutation_log_string"],
+        globals()["evaluated_values_log_string"],
+        globals()["pareto_log_string"],
+        globals()["raw_evaluated_values_row"],
+    ) = _GetLogString(config)
     globals()["OptimizationGoal"] = _GetOptimizationGoals(config)
     globals()["comments"] = GetFigureTitle(config)
 
@@ -288,7 +295,6 @@ class DataGenerator(tf.keras.utils.Sequence):
     """
 
     def __init__(self, x_set, y_set, batch_size=1):
-
         assert len(x_set) == len(
             y_set
         ), "Arrays passed to DataGenerator have different lengths"
@@ -300,15 +306,13 @@ class DataGenerator(tf.keras.utils.Sequence):
         return len(self.x) // self.batch_size
 
     def __getitem__(self, item):
-
-        batch_x = self.x[item * self.batch_size: (item + 1) * self.batch_size]
-        batch_y = self.y[item * self.batch_size: (item + 1) * self.batch_size]
+        batch_x = self.x[item * self.batch_size : (item + 1) * self.batch_size]
+        batch_y = self.y[item * self.batch_size : (item + 1) * self.batch_size]
 
         return batch_x, batch_y
 
 
 def _convert_array_to_datagen(array_x, array_y, batch_size=1):
-
     return DataGenerator(array_x, array_y, batch_size)
 
 
@@ -507,5 +511,4 @@ def get_global(var_name):
 
 
 def set_global(var_name, val):
-
     globals()[var_name] = val

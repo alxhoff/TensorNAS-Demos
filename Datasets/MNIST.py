@@ -28,5 +28,4 @@ def GetData(dataset_dir):
 
 
 def GetInputShape():
-
     return (28, 28, 1)
