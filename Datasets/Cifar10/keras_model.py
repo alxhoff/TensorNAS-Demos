@@ -22,6 +22,7 @@ from tensorflow.keras.layers import (
 from tensorflow.keras.layers import Conv2D, AveragePooling2D, MaxPooling2D
 from tensorflow.keras.regularizers import l2
 
+
 # get model
 def get_model_name():
     if os.path.exists("trained_models/trainedResnet.h5"):

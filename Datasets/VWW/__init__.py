@@ -11,7 +11,6 @@ TARGET_SIZE = 96
 
 class DatasetImageWrapper:
     def __init__(self, dataset):
-
         self.dataset = dataset
 
     def __getitem__(self, item):
@@ -22,11 +21,9 @@ class DatasetImageWrapper:
 
 class DatasetLabelWrapper:
     def __init__(self, dataset):
-
         self.dataset = dataset
 
     def __getitem__(self, item):
-
         return self.dataset[item][1]
 
 
@@ -319,5 +316,4 @@ def resize_save_image(image, save_index, out_dir):
 
 
 def GetInputShape():
-
     return (96, 96, 3)

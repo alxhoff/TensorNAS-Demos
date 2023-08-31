@@ -4,7 +4,6 @@ dataset_url = "https://www.cs.toronto.edu/~kriz/{}".format(dataset_zip)
 
 
 def GetData(dataset_dir):
-
     from Demos.Datasets import (
         make_dataset_dirs,
         tmp_dir,
@@ -77,5 +76,4 @@ def GetData(dataset_dir):
 
 
 def GetInputShape():
-
     return (32, 32, 3)

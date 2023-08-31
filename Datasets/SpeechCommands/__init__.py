@@ -53,5 +53,4 @@ def GetData(dataset_dir):
 
 
 def GetInputShape():
-
     return (49, 10, 1)

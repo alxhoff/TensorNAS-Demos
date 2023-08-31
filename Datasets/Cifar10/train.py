@@ -37,11 +37,12 @@ order, but some training batches may contain more images from one class than ano
 batches contain exactly 5000 images from each class.
 """
 
+
 # learning rate schedule
 def lr_schedule(epoch):
     initial_learning_rate = 0.001
     decay_per_epoch = 0.99
-    lrate = initial_learning_rate * (decay_per_epoch ** epoch)
+    lrate = initial_learning_rate * (decay_per_epoch**epoch)
     print("Learning rate = %f" % lrate)
     return lrate
 

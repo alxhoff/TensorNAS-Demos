@@ -5,7 +5,6 @@ zip_dir = tmp_dir + "/zips"
 
 
 def _make_tmp_dir():
-
     if os.path.isdir(tmp_dir) == False:
         os.mkdir(tmp_dir)
 
@@ -14,7 +13,6 @@ def _make_tmp_dir():
 
 
 def make_dataset_dirs(dataset_name):
-
     _make_tmp_dir()
 
     dir = tmp_dir + "/{}".format(dataset_name)

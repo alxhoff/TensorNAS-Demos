@@ -1,5 +1,4 @@
 if __name__ == "__main__":
-
     import argparse
 
     from Demos import (

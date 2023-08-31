@@ -76,7 +76,7 @@ def get_preprocess_audio_func(model_settings, is_training=False, background_data
         if model_settings["feature_type"] != "td_samples":
             wav_decoder = wav_decoder / tf.reduce_max(wav_decoder)
         else:
-            wav_decoder = wav_decoder / tf.constant(2 ** 15, dtype=tf.float32)
+            wav_decoder = wav_decoder / tf.constant(2**15, dtype=tf.float32)
         # Previously, decode_wav was used with desired_samples as the length of array. The
         # default option of this function was to pad zeros if the desired samples are not found
         wav_decoder = tf.pad(
@@ -175,7 +175,7 @@ def get_preprocess_audio_func(model_settings, is_training=False, background_data
 
         elif model_settings["feature_type"] == "lfbe":
             # apply preemphasis
-            preemphasis_coef = 1 - 2 ** -5
+            preemphasis_coef = 1 - 2**-5
             power_offset = 52
             num_mel_bins = model_settings["dct_coefficient_count"]
             paddings = tf.constant([[0, 0], [1, 0]])

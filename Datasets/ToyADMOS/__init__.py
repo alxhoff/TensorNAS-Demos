@@ -10,7 +10,6 @@ download_suffix = "?download=1"
 
 
 def _create_subdirs(parent_dir):
-
     parent_dir = os.path.join(tmp_dir, parent_dir)
     train_dir = parent_dir + "/train_normal"
     if os.path.isdir(train_dir) == False:
@@ -27,7 +26,6 @@ def _create_subdirs(parent_dir):
 
 
 def _pull_dataset(dataset_name):
-
     from Demos.Datasets import tmp_dir, zip_dir, make_dataset_dirs
 
     if os.path.isdir(tmp_dir) == False:
@@ -175,7 +173,6 @@ def GetData(dataset_dir):
 
 
 def GetInputShape():
-
     return (640,)
 
 
