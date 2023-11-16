@@ -92,7 +92,10 @@ def evaluate_individual(individual, test_name, gen, logger):
     global dataset_module, verbose, train_len, test_len, validation_split, validation_len
 
     if not get_global("multithreaded"):
-        if not any(k in globals() for k in ("train_generator", "train_len" "test_generator", "test_len")):
+        if not any(
+            k in globals()
+            for k in ("train_generator", "train_len" "test_generator", "test_len")
+        ):
             from Demos import set_test_train_data
 
             set_test_train_data(
@@ -138,13 +141,19 @@ def mutate_individual(individual):
     mutated = False
     mutation_operation, mutation_note, mutation_table_references = None, None, None
 
-    while attempts < mutation_attempts and mutated == False:
+    while attempts < mutation_attempts and mutated is False:
         try:
             attempt = deepcopy(individual.block_architecture)
-            (mutation_operation, mutation_note, mutation_table_references) = attempt.mutate(
+            (
+                mutation_operation,
+                mutation_note,
+                mutation_table_references,
+            ) = attempt.mutate(
                 mutation_method=get_global("mutation_method"),
                 mutation_probability=get_global("self_mutation_probability"),
-                mutate_with_reinforcement_learning=get_global("use_reinforcement_learning"),
+                mutate_with_reinforcement_learning=get_global(
+                    "use_reinforcement_learning"
+                ),
                 goal_attainment=get_global("use_goal_attainment"),
                 verbose=verbose,
             )
