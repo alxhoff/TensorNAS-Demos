@@ -1,5 +1,8 @@
 if __name__ == "__main__":
     import argparse
+    import os
+
+    print(os.getcwd())
 
     from Demos import (
         load_globals_from_config,
