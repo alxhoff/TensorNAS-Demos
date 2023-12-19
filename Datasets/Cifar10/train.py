@@ -106,7 +106,7 @@ def load_cifar_10_data(data_dir, negatives=False):
     if negatives:
         cifar_train_data = cifar_train_data.transpose(0, 2, 3, 1).astype(np.float32)
     else:
-        cifar_train_data = np.rollaxis(cifar_train_data, 1, 4)
+        cifar_train_data = np.rollaxis(cifar_train_data, 1, 4).astype(np.float32)
     cifar_train_filenames = np.array(cifar_train_filenames)
     cifar_train_labels = np.array(cifar_train_labels)
 
@@ -119,7 +119,7 @@ def load_cifar_10_data(data_dir, negatives=False):
     if negatives:
         cifar_test_data = cifar_test_data.transpose(0, 2, 3, 1).astype(np.float32)
     else:
-        cifar_test_data = np.rollaxis(cifar_test_data, 1, 4)
+        cifar_test_data = np.rollaxis(cifar_test_data, 1, 4).astype(np.float32)
     cifar_test_filenames = np.array(cifar_test_filenames)
     cifar_test_labels = np.array(cifar_test_labels)
 
