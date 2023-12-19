@@ -89,7 +89,7 @@ def gen_auc_ba():
 def evaluate_individual(individual, test_name, gen, logger):
     global epochs, batch_size, loss, metrics, train_generator, validation_generator, use_clear_memory
     global test_generator, save_individuals, q_aware, steps_per_epoch, batch_size, test_batch_size, test_len
-    global dataset_module, verbose, train_len, test_len, validation_split, validation_len
+    global dataset_module, verbose, train_len, test_len, validation_split, validation_len, dataset_generator
 
     if not get_global("multithreaded"):
         if not any(
@@ -113,6 +113,7 @@ def evaluate_individual(individual, test_name, gen, logger):
         test_len=test_len,
         validation_generator=validation_generator,
         validation_len=validation_len,
+        representative_dataset=dataset_generator,
         epochs=epochs,
         batch_size=batch_size,
         test_batch_size=test_batch_size,
@@ -360,6 +361,16 @@ def set_test_train_data(
 
         train_data = train_data[:train_len]
         train_labels = train_labels[:train_len]
+
+        globals()["train_data"] = train_data
+
+        def GetRepresentativeDataset():
+            import numpy as np 
+
+            for i in range(500):
+                yield [np.array(train_data[i:i+1])]
+
+        globals()["dataset_generator"] = GetRepresentativeDataset
 
         if test_sample_size is not None:
             if test_sample_size > 0:

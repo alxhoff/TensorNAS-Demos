@@ -36,9 +36,11 @@ print("Model1 has an accuracy of {0:.2f}%".format(res[1] * 100))
 
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
 
+globals()["data"] = train_images
+
 def representative_dataset():
     for i in range(500):
-        yield [np.array(train_images[i:i+1])]
+        yield [np.array(globals()["data"][i:i+1])]
 
 print(np.array(train_images[0]).shape)
 print(np.array(train_images[0]))
