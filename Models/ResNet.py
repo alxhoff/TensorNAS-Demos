@@ -7,6 +7,7 @@ import pickle
 from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras.utils import to_categorical
 
+
 def unpickle(file):
     """load the cifar-10 data"""
 
@@ -76,8 +77,10 @@ def load_cifar_10_data(data_dir, negatives=False):
         cifar_label_names,
     )
 
+
 tmp_dir = "/tmp"
 zip_dir = tmp_dir + "/zips"
+
 
 def GetData(dataset_dir):
 
@@ -186,6 +189,7 @@ def bar_progress(current, total, width=80):
     sys.stdout.write("\r" + progress_message)
     sys.stdout.flush()
 
+
 dataset = GetData("")
 
 dataset["train_data"] = dataset["train_data"].astype(np.float32)
@@ -195,120 +199,142 @@ dataset["test_data"] = dataset["test_data"].astype(np.float32)
 # dataset["test_data"] / 255.0
 
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Dense, Activation, Flatten, BatchNormalization
+from tensorflow.keras.layers import (
+    Input,
+    Dense,
+    Activation,
+    Flatten,
+    BatchNormalization,
+)
 from tensorflow.keras.layers import Conv2D, AveragePooling2D, MaxPooling2D
 from tensorflow.keras.regularizers import l2
 
-input_shape=[32,32,3] # default size for cifar10
-num_classes=10 # default class number for cifar10
+input_shape = [32, 32, 3]  # default size for cifar10
+num_classes = 10  # default class number for cifar10
 num_filters = 16
 
 inputs = Input(shape=(32, 32, 3))
-x = Conv2D(num_filters,
-            kernel_size=3,
-            strides=1,
-            padding='same',
-            kernel_initializer='he_normal',
-            kernel_regularizer=l2(1e-4))(inputs)
+x = Conv2D(
+    num_filters,
+    kernel_size=3,
+    strides=1,
+    padding="same",
+    kernel_initializer="he_normal",
+    kernel_regularizer=l2(1e-4),
+)(inputs)
 x = BatchNormalization()(x)
-x = Activation('relu')(x)
+x = Activation("relu")(x)
 
 # First stack
 
 # Weight layers
-y = Conv2D(num_filters,
-              kernel_size=3,
-              strides=1,
-              padding='same',
-              kernel_initializer='he_normal',
-              kernel_regularizer=l2(1e-4))(x)
+y = Conv2D(
+    num_filters,
+    kernel_size=3,
+    strides=1,
+    padding="same",
+    kernel_initializer="he_normal",
+    kernel_regularizer=l2(1e-4),
+)(x)
 y = BatchNormalization()(y)
-y = Activation('relu')(y)
-y = Conv2D(num_filters,
-              kernel_size=3,
-              strides=1,
-              padding='same',
-              kernel_initializer='he_normal',
-              kernel_regularizer=l2(1e-4))(y)
+y = Activation("relu")(y)
+y = Conv2D(
+    num_filters,
+    kernel_size=3,
+    strides=1,
+    padding="same",
+    kernel_initializer="he_normal",
+    kernel_regularizer=l2(1e-4),
+)(y)
 y = BatchNormalization()(y)
 
 # Overall residual, connect weight layer and identity paths
 x = tf.keras.layers.add([x, y])
-x = Activation('relu')(x)
+x = Activation("relu")(x)
 
 
 # Second stack
 
 # Weight layers
-num_filters = 32 # Filters need to be double for each stack
-y = Conv2D(num_filters,
-              kernel_size=3,
-              strides=2,
-              padding='same',
-              kernel_initializer='he_normal',
-              kernel_regularizer=l2(1e-4))(x)
+num_filters = 32  # Filters need to be double for each stack
+y = Conv2D(
+    num_filters,
+    kernel_size=3,
+    strides=2,
+    padding="same",
+    kernel_initializer="he_normal",
+    kernel_regularizer=l2(1e-4),
+)(x)
 y = BatchNormalization()(y)
-y = Activation('relu')(y)
-y = Conv2D(num_filters,
-              kernel_size=3,
-              strides=1,
-              padding='same',
-              kernel_initializer='he_normal',
-              kernel_regularizer=l2(1e-4))(y)
+y = Activation("relu")(y)
+y = Conv2D(
+    num_filters,
+    kernel_size=3,
+    strides=1,
+    padding="same",
+    kernel_initializer="he_normal",
+    kernel_regularizer=l2(1e-4),
+)(y)
 y = BatchNormalization()(y)
 
 # Adjust for change in dimension due to stride in identity
-x = Conv2D(num_filters,
-              kernel_size=1,
-              strides=2,
-              padding='same',
-              kernel_initializer='he_normal',
-              kernel_regularizer=l2(1e-4))(x)
+x = Conv2D(
+    num_filters,
+    kernel_size=1,
+    strides=2,
+    padding="same",
+    kernel_initializer="he_normal",
+    kernel_regularizer=l2(1e-4),
+)(x)
 
 # Overall residual, connect weight layer and identity paths
 x = tf.keras.layers.add([x, y])
-x = Activation('relu')(x)
+x = Activation("relu")(x)
 
 
 # Third stack
 
 # Weight layers
 num_filters = 64
-y = Conv2D(num_filters,
-              kernel_size=3,
-              strides=2,
-              padding='same',
-              kernel_initializer='he_normal',
-              kernel_regularizer=l2(1e-4))(x)
+y = Conv2D(
+    num_filters,
+    kernel_size=3,
+    strides=2,
+    padding="same",
+    kernel_initializer="he_normal",
+    kernel_regularizer=l2(1e-4),
+)(x)
 y = BatchNormalization()(y)
-y = Activation('relu')(y)
-y = Conv2D(num_filters,
-              kernel_size=3,
-              strides=1,
-              padding='same',
-              kernel_initializer='he_normal',
-              kernel_regularizer=l2(1e-4))(y)
+y = Activation("relu")(y)
+y = Conv2D(
+    num_filters,
+    kernel_size=3,
+    strides=1,
+    padding="same",
+    kernel_initializer="he_normal",
+    kernel_regularizer=l2(1e-4),
+)(y)
 y = BatchNormalization()(y)
 
 # Adjust for change in dimension due to stride in identity
-x = Conv2D(num_filters,
-              kernel_size=1,
-              strides=2,
-              padding='same',
-              kernel_initializer='he_normal',
-              kernel_regularizer=l2(1e-4))(x)
+x = Conv2D(
+    num_filters,
+    kernel_size=1,
+    strides=2,
+    padding="same",
+    kernel_initializer="he_normal",
+    kernel_regularizer=l2(1e-4),
+)(x)
 
 # Overall residual, connect weight layer and identity paths
 x = tf.keras.layers.add([x, y])
-x = Activation('relu')(x)
+x = Activation("relu")(x)
 
- # Final classification layer.
+# Final classification layer.
 pool_size = int(np.amin(x.shape[1:3]))
 x = AveragePooling2D(pool_size=pool_size)(x)
 y = Flatten()(x)
-outputs = Dense(num_classes,
-                activation='softmax',
-                kernel_initializer='he_normal')(y)
+outputs = Dense(num_classes, activation="softmax", kernel_initializer="he_normal")(y)
 
 # Instantiate model.
 model = Model(inputs=inputs, outputs=outputs)
@@ -316,7 +342,7 @@ model = Model(inputs=inputs, outputs=outputs)
 EPOCHS = 5
 BS = 512
 
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
 model.fit(dataset["train_data"], dataset["train_labels"], epochs=EPOCHS, batch_size=BS)
 model.summary()
 res = model.evaluate(dataset["test_data"], dataset["test_labels"])
@@ -324,10 +350,11 @@ print("Model1 has an accuracy of {0:.2f}%".format(res[1] * 100))
 
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
 
+
 def representative_dataset():
     for i in range(500):
-        yield [np.array(dataset["train_data"][i:i+1])]
-                # yield [np.array(dataset["train_data"][i:i+1])]
+        yield [np.array(dataset["train_data"][i : i + 1])]
+        # yield [np.array(dataset["train_data"][i:i+1])]
 
 
 print(np.array(dataset["train_data"][0]).ndim)
@@ -337,9 +364,9 @@ converter.optimizations = [tf.lite.Optimize.DEFAULT]
 converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
 converter.inference_input_type = tf.int8
 converter.inference_output_type = tf.int8
-converter._experimental_new_quantizer=True
+converter._experimental_new_quantizer = True
 
 tflite_quant_model = converter.convert()
 
-with open('quantized_model.tflite', 'wb') as f:
+with open("quantized_model.tflite", "wb") as f:
     f.write(tflite_quant_model)

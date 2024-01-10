@@ -42,12 +42,22 @@ batches contain exactly 5000 images from each class.
 def lr_schedule(epoch):
     initial_learning_rate = 0.001
     decay_per_epoch = 0.99
-    lrate = initial_learning_rate * (decay_per_epoch**epoch)
+    lrate = initial_learning_rate * (decay_per_epoch ** epoch)
     print("Learning rate = %f" % lrate)
     return lrate
 
 
 lr_scheduler = LearningRateScheduler(lr_schedule)
+
+# reset any GPUs
+from numba import cuda
+
+device = cuda.get_current_device()
+device.reset()
+
+from tensorflow.keras import backend as k
+
+k.clear_session()
 
 # optimizer
 optimizer = tf.keras.optimizers.Adam()

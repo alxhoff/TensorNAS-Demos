@@ -92,6 +92,7 @@ def run_deap_test(generate_individual, evaluate_individual, crossover, mutate):
         comment=get_global("comments"),
         multithreaded=get_global("multithreaded"),
         log=get_global("log"),
+        trace_memory_usage=get_global("gettracememoryuse"),
         start_gen=get_global("start_gen"),
     )
 

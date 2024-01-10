@@ -194,6 +194,7 @@ def load_globals_from_config(config):
         GetBlockArchitecture,
         GetClassCount,
         GetLog,
+        GetTraceMemoryUse,
         GetVerbose,
         GetMultithreaded,
         GetDistributed,
@@ -221,6 +222,7 @@ def load_globals_from_config(config):
     globals()["class_count"] = GetClassCount(config)
     globals()["ba_mod"] = GetBlockMod(globals()["ba_name"])
     globals()["log"] = GetLog(config)
+    globals()["gettracememoryuse"] = GetTraceMemoryUse(config)
     globals()["verbose"] = GetVerbose(config)
     globals()["multithreaded"] = GetMultithreaded(config)
     globals()["distributed"] = GetDistributed(config)
@@ -281,11 +283,15 @@ def load_globals_from_config(config):
 
     if not globals()["verbose"]:
         import os
+
+        os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # FATAL
+        from silence_tensorflow import silence_tensorflow
+
+        silence_tensorflow()
         import tensorflow as tf
 
         print("Suppressing verbosity")
         tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-        os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # FATAL
 
 
 class DataGenerator(tf.keras.utils.Sequence):
@@ -365,10 +371,10 @@ def set_test_train_data(
         globals()["train_data"] = train_data
 
         def GetRepresentativeDataset():
-            import numpy as np 
+            import numpy as np
 
             for i in range(500):
-                yield [np.array(train_data[i:i+1])]
+                yield [np.array(train_data[i : i + 1])]
 
         globals()["dataset_generator"] = GetRepresentativeDataset
 

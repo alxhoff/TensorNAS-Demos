@@ -31,5 +31,3 @@ def bar_progress(current, total, width=80):
     )
     sys.stdout.write("\r" + progress_message)
     sys.stdout.flush()
-
-
