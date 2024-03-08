@@ -311,7 +311,7 @@ def resize_save_image(image, save_index, out_dir):
 
     wpercent = TARGET_SIZE / float(image.size[0])
     hsize = int((float(image.size[1]) * float(wpercent)))
-    image = image.resize((TARGET_SIZE, hsize), Image.ANTIALIAS)
+    image = image.resize((TARGET_SIZE, hsize), Image.Resampling.LANCZOS)
     image.save("{}/{}.jpg".format(out_dir, save_index))
 
 
