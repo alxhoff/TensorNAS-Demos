@@ -84,11 +84,12 @@ def do_model(train_images, train_labels):
 
 def dump_garbage():
     print("\nGARBAGE OBJECTS:")
-    sym_tens = [x for x in gc.garbage if x.__class__.__name__ is 'SymbolicTensor']
+    sym_tens = [x for x in gc.garbage if x.__class__.__name__ is "SymbolicTensor"]
     print(len(sym_tens))
     for x in sym_tens:
         s = str(x)
-        if len(s) > 80: s = s[:77] + '...'
+        if len(s) > 80:
+            s = s[:77] + "..."
         print(type(x), "\n  ", s)
 
 

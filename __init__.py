@@ -400,10 +400,14 @@ def set_test_train_data(
                 val_len = validation_sample_size
 
         # Create validation generator
-        if batch_size > val_len:
+        if batch_size == None:
             vbatch_size = val_len
         else:
-            vbatch_size = batch_size
+            if batch_size > val_len:
+                vbatch_size = val_len
+            else:
+                vbatch_size = batch_size
+
         globals()["validation_generator"] = DataGenerator(
             x_set=train_data[train_len:],
             y_set=train_labels[train_len:],
